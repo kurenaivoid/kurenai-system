@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KURENAI SYSTEM</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    background: #050000;
+    overflow-x: hidden;
+  }
+
+  * { box-sizing: border-box; }
+
+  #top-final {
+    width: 100%;
+    height: 100dvh;
+    min-height: 100vh;
+    background: #050000;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  @keyframes flicker { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.6; } }
+  @keyframes blink { 0% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes titleIn {
+    0%   { opacity: 0; letter-spacing: 2em; filter: blur(6px); }
+    100% { opacity: 1; letter-spacing: 0.5em; filter: blur(0); }
+  }
+  @keyframes tagIn {
+    0%   { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 0.65; transform: translateY(0); }
+  }
+
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,0,0,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .scanlines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.02) 3px);
+    pointer-events: none;
+  }
+
+  #bleed {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(180,0,0,0.13) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hud {
+    position: absolute;
+    font-family: monospace;
+    font-size: 11px;
+    color: rgba(255,0,0,0.5);
+    line-height: 1.4;
+    z-index: 2;
+  }
+  .hud.top-left { left: 20px; top: 20px; }
+  .hud.bottom-right { right: 20px; bottom: 20px; text-align: right; }
+
+  .side-index {
+    position: absolute; left: 20px; top: 50%;
+    transform: translateY(-50%);
+    height: 40%;
+    border-left: 1px solid rgba(255,0,0,0.2);
+    font-family: monospace; font-size: 10px;
+    color: rgba(255,0,0,0.3);
+    padding-left: 5px;
+    display: none;
+  }
+  @media (min-width: 720px) { .side-index { display: block; } }
+
+  .brand {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 0 24px;
+  }
+
+  .brand h1 {
+    margin: 0;
+    color: #f2eaea;
+    font-size: clamp(28px, 6vw, 56px);
+    font-weight: 400;
+    letter-spacing: 0.5em;
+    text-indent: 0.5em; /* optical centering against the wide tracking */
+    animation: titleIn 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .brand .tagline {
+    margin: 18px 0 0;
+    color: #d9c9c9;
+    font-size: clamp(11px, 1.6vw, 14px);
+    letter-spacing: 0.35em;
+    text-indent: 0.35em;
+    opacity: 0;
+    animation: tagIn 1.2s ease-out 1.1s forwards;
+  }
+
+  nav.menu {
+    position: relative;
+    z-index: 3;
+    margin-top: 64px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 12px;
+    padding: 0 24px;
+    opacity: 0;
+    animation: tagIn 1s ease-out 1.6s forwards;
+  }
+
+  nav.menu a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #eee;
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    background: rgba(0,0,0,0.35);
+    transition: border-color 0.4s ease, background 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  nav.menu a .glyph {
+    color: rgba(255,60,60,0.7);
+  }
+
+  nav.menu a:hover,
+  nav.menu a:focus-visible {
+    border-color: #f00;
+    color: #fff;
+    background: radial-gradient(circle, rgba(255,0,0,0.22) 0%, rgba(0,0,0,0.4) 75%);
+    box-shadow: 0 0 22px rgba(255,0,0,0.25), inset 0 0 10px rgba(255,0,0,0.2);
+  }
+
+  nav.menu a[data-status="soon"]::after {
+    content: 'COMING SOON';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: rgba(255,120,120,0.55);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  nav.menu a[data-status="soon"]:hover::after {
+    opacity: 1;
+  }
+
+  .brand-mark {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    color: #600;
+    font-size: 12px;
+    letter-spacing: 0.8em;
+    animation: flicker 4s infinite;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand h1, .brand .tagline, nav.menu, .brand-mark {
+      animation: none !important;
+      opacity: 1 !important;
+      letter-spacing: inherit;
+      filter: none;
+    }
+  }
+</style>
+</head>
+
+<body>
+<div id="top-final">
+
+  <div class="grid-bg"></div>
+  <div class="scanlines"></div>
+  <div id="bleed"></div>
+
+  <div class="hud top-left">
+    SYS_ID: KURENAI_V03<br>
+    COORD: <span id="coord-x">000</span>, <span id="coord-y">000</span><br>
+    UPTIME: <span id="uptime">0.0000</span>s
+  </div>
+
+  <div class="side-index">
+    01<br><br>02<br><br>03<br><br>04
+  </div>
+
+  <div class="hud bottom-right">
+    DATA_STREAM: [ <span id="stream">---</span> ]<br>
+    STATUS: <span style="color:rgba(255,0,0,0.8); animation: blink 1s steps(2) infinite;">ONLINE</span>
+  </div>
+
+  <div class="brand">
+    <h1>KURENAI SYSTEM</h1>
+    <p class="tagline">BEYOND THE PROMPT</p>
+  </div>
+
+  <nav class="menu" aria-label="メインナビゲーション">
+    <a href="https://www.youtube.com/@Hatenko-Channel" target="_blank" rel="noopener">
+      <span class="glyph">></span>WATCH
+    </a>
+    <a href="#" data-status="soon" onclick="return false;">
+      <span class="glyph">></span>AI SYSTEMS
+    </a>
+    <a href="https://kurenaivoid.base.shop/" target="_blank" rel="noopener">
+      <span class="glyph">></span>SHOP
+    </a>
+    <a href="#" data-status="soon" onclick="return false;">
+      <span class="glyph">></span>READ
+    </a>
+    <a href="#" data-status="soon" onclick="return false;">
+      <span class="glyph">></span>ABOUT
+    </a>
+  </nav>
+
+  <div class="brand-mark">KURENAI _ SYSTEM</div>
+
+</div>
+
+<script>
+  const gate = document.getElementById('top-final');
+  const bleed = document.getElementById('bleed');
+  const cx = document.getElementById('coord-x');
+  const cy = document.getElementById('coord-y');
+  const ut = document.getElementById('uptime');
+  const st = document.getElementById('stream');
+
+  const startTime = Date.now();
+
+  gate.addEventListener('mousemove', (e) => {
+    const rect = gate.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    gate.style.setProperty('--x', x + 'px');
+    gate.style.setProperty('--y', y + 'px');
+
+    cx.innerText = Math.floor(x).toString().padStart(3, '0');
+    cy.innerText = Math.floor(y).toString().padStart(3, '0');
+  });
+
+  setInterval(() => {
+    ut.innerText = ((Date.now() - startTime) / 1000).toFixed(4);
+    st.innerText = Math.random().toString(16).substring(2, 10).toUpperCase();
+  }, 100);
+</script>
+</body>
+</html>
