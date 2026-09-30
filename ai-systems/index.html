@@ -1,1 +1,498 @@
-1
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI SYSTEMS | KURENAI VOID</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --bg:#070707;
+    --panel:#0d0d0d;
+    --line:rgba(255,255,255,.08);
+    --text:#f4f4f4;
+    --muted:#8b8b8b;
+    --accent:#a31212;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    width:100%;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+}
+
+body{
+    position:relative;
+}
+
+/* subtle grid */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+
+    background:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg,var(--line) 1px, transparent 1px);
+
+    background-size:64px 64px;
+    opacity:.16;
+    pointer-events:none;
+}
+
+/* scan texture */
+
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+
+    background:
+    repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,.01) 0px,
+        rgba(255,255,255,.01) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+
+    pointer-events:none;
+}
+
+.wrapper{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:48px 7vw;
+}
+
+/* HEADER */
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+}
+
+.header-left{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.page-title{
+    font-size:.95rem;
+    letter-spacing:.28em;
+    font-weight:600;
+}
+
+.system-tag{
+    color:var(--muted);
+    font-size:.74rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+}
+
+.header-right{
+    color:var(--muted);
+    font-size:.72rem;
+    letter-spacing:.18em;
+    text-align:right;
+}
+
+/* MAIN */
+
+main{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.system-gate{
+    width:min(760px,100%);
+    text-align:center;
+    animation:fadeUp 1.2s ease;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.section-label{
+    color:var(--accent);
+    font-size:.75rem;
+    letter-spacing:.24em;
+    margin-bottom:20px;
+}
+
+.main-title{
+    font-size:clamp(2.4rem,6vw,5rem);
+    font-weight:500;
+    letter-spacing:-0.04em;
+    line-height:1;
+}
+
+.subtitle{
+    margin-top:16px;
+    color:var(--muted);
+    font-size:.78rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+}
+
+.divider{
+    position:relative;
+    height:1px;
+    margin:36px auto;
+    background:var(--line);
+    max-width:420px;
+    overflow:hidden;
+}
+
+.divider::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-25%;
+    width:25%;
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(163,18,18,.8),
+        transparent
+    );
+
+    animation:scan 8s linear infinite;
+}
+
+@keyframes scan{
+    from{
+        left:-25%;
+    }
+    to{
+        left:125%;
+    }
+}
+
+/* SYSTEM MENU */
+
+.system-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    max-width:460px;
+    margin:0 auto;
+}
+
+.system-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:21px 24px;
+
+    border:1px solid var(--line);
+
+    text-decoration:none;
+
+    color:var(--text);
+
+    transition:.35s ease;
+
+    background:rgba(255,255,255,.015);
+}
+
+.system-card:hover{
+    border-color:rgba(163,18,18,.45);
+    transform:translateY(-2px);
+    background:rgba(255,255,255,.025);
+}
+
+.system-info{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:7px;
+}
+
+.system-name{
+    font-size:1rem;
+    letter-spacing:.1em;
+}
+
+.system-description{
+    color:var(--muted);
+    font-size:.68rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+
+.system-arrow{
+    color:var(--muted);
+    transition:.3s ease;
+}
+
+.system-card:hover .system-arrow{
+    color:var(--text);
+    transform:translateX(3px);
+}
+
+.helper{
+    margin-top:24px;
+    color:var(--muted);
+    font-size:.72rem;
+    letter-spacing:.12em;
+}
+
+/* FOOTER */
+
+footer{
+    margin-top:80px;
+
+    border-top:1px solid var(--line);
+
+    padding-top:24px;
+
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.signature{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.signature-title{
+    font-size:.82rem;
+    letter-spacing:.12em;
+    color:#d9d9d9;
+}
+
+.signature-site a{
+    color:var(--muted);
+    text-decoration:none;
+    transition:.3s;
+}
+
+.signature-site a:hover{
+    color:white;
+}
+
+.footer-meta{
+    color:var(--muted);
+    font-size:.74rem;
+    letter-spacing:.16em;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .wrapper{
+        padding:28px;
+    }
+
+    header{
+        flex-direction:column;
+    }
+
+    .header-right{
+        text-align:left;
+    }
+
+    footer{
+        flex-direction:column;
+    }
+
+    .system-card{
+        padding:18px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<header>
+
+    <div class="header-left">
+
+        <div class="page-title">
+            AI SYSTEMS / KURENAI VOID
+        </div>
+
+        <div class="system-tag">
+            KURENAI SYSTEM / BEYOND THE PROMPT
+        </div>
+
+    </div>
+
+    <div class="header-right">
+        AI SYSTEMS<br>
+        ACCESS POINT
+    </div>
+
+</header>
+
+
+<main>
+
+<section class="system-gate">
+
+    <div class="section-label">
+        SELECT SYSTEM
+    </div>
+
+    <h1 class="main-title">
+        AI SYSTEMS
+    </h1>
+
+    <div class="subtitle">
+        Applications / Prompts / Web
+    </div>
+
+    <div class="divider"></div>
+
+
+    <nav class="system-list">
+
+        <!-- PORTA-WEB -->
+
+        <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/porta-web/" class="system-card">
+
+            <div class="system-info">
+
+                <span class="system-name">
+                    PORTA-WEB
+                </span>
+
+                <span class="system-description">
+                    Web Systems / Websites / Projects
+                </span>
+
+            </div>
+
+            <span class="system-arrow">
+                →
+            </span>
+
+        </a>
+
+
+        <!-- APPLICATIONS -->
+
+        <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/applications/" class="system-card">
+
+            <div class="system-info">
+
+                <span class="system-name">
+                    APPLICATIONS
+                </span>
+
+                <span class="system-description">
+                    AI Tools / Software / Systems
+                </span>
+
+            </div>
+
+            <span class="system-arrow">
+                →
+            </span>
+
+        </a>
+
+
+        <!-- PROMPTS -->
+
+        <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/prompts/" class="system-card">
+
+            <div class="system-info">
+
+                <span class="system-name">
+                    PROMPTS
+                </span>
+
+                <span class="system-description">
+                    Prompt Resources / Free Access
+                </span>
+
+            </div>
+
+            <span class="system-arrow">
+                →
+            </span>
+
+        </a>
+
+    </nav>
+
+
+    <div class="helper">
+        SELECT AN ACCESS POINT
+    </div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+    <div class="signature">
+
+        <div class="signature-title">
+            KURENAI SYSTEM — Built Beyond the Prompt.
+        </div>
+
+        <div class="signature-site">
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/">
+                AI SYSTEMS
+            </a>
+        </div>
+
+    </div>
+
+
+    <div class="footer-meta">
+        KURENAI VOID / AI SYSTEMS
+    </div>
+
+</footer>
+
+</div>
+
+</body>
+</html>
