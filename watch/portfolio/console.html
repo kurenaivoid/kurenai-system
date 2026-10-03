@@ -590,12 +590,20 @@ footer{
     async function loadDataFromGithubAPI() {
         try {
             const res = await fetch('data.json?' + Date.now());
-            if (!res.ok) throw new Error('data.jsonが見つかりません');
-            assets = await res.json();
+            if (!res.ok) {
+                const detail = await res.text().catch(() => '');
+                throw new Error(`data.json読み込み失敗 (${res.status}) ${detail}`);
+            }
+            const loaded = await res.json();
+            if (!Array.isArray(loaded)) {
+                throw new Error('data.jsonの形式が不正です。配列データが必要です。');
+            }
+            assets = loaded;
             render();
         } catch (e) {
-            assets = [];
+            console.error('[データ読み込みエラー]', e);
             render();
+            showModal(`[データ読み込みエラー] ${e && e.message ? e.message : String(e)}\n\n現在の管理画面データは消去していません。`);
         }
     }
 
@@ -866,8 +874,9 @@ footer{
             showModal('[画像登録完了] 選択した画像をGitHubへ反映しました。');
             await loadDataFromGithubAPI();
         } catch (err) {
-            console.error(err);
-            showModal('[画像登録エラー] GitHubへの反映に失敗しました。トークン・リポジトリ名・権限を確認してください。');
+            console.error('[画像登録エラー]', err);
+            const detail = err && err.message ? err.message : String(err);
+            showModal(`[画像登録エラー] ${detail}`);
         }
     }
 
@@ -1020,32 +1029,46 @@ footer{
 
         try {
             showModal('[同期中] GitHubへ送信しています...');
-            
+
             for (let i = 0; i < assets.length; i++) {
                 if (assets[i]._pendingFile) {
                     const file = assets[i]._pendingFile;
-                    const ext = file.name.split('.').pop();
+                    const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
                     const fileName = `watch/portfolio/images/thumb_${Date.now()}_${i}.${ext}`;
-                    const base64Content = assets[i].thumb.split(',')[1];
+                    const commaIndex = (assets[i].thumb || '').indexOf(',');
+                    if (commaIndex < 0) {
+                        throw new Error(`画像データ不正 (ID: ${assets[i].id || 'N/A'})`);
+                    }
+                    const base64Content = assets[i].thumb.slice(commaIndex + 1);
 
-                    await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
+                    const imageRes = await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `token ${token}`,
-                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github+json',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ message: `画像追加: ${fileName}`, content: base64Content })
                     });
+
+                    if (!imageRes.ok) {
+                        const detail = await imageRes.text().catch(() => '');
+                        throw new Error(`画像アップロード失敗 (${imageRes.status}) ${detail}`);
+                    }
+
                     assets[i].thumb = fileName.replace('watch/portfolio/', '');
                     delete assets[i]._pendingFile;
                 }
             }
 
             await updateDataJsonOnGitHub(token, repo, '一括同期');
+            render();
             showModal('[同期成功] GitHubへ正常に反映されました！');
-            loadDataFromGithubAPI();
+            await loadDataFromGithubAPI();
         } catch (err) {
-            showModal('[同期エラー] 通信に失敗しました。認証情報を確認してください。');
+            console.error('[同期エラー]', err);
+            const detail = err && err.message ? err.message : String(err);
+            showModal(`[同期エラー] ${detail}`);
         }
     }
 </script>
