@@ -560,10 +560,10 @@ footer{
         }
     }
 
-    // --- データロード (GitHub API / data.json) ---
+    // --- データロード (GitHub API / portfolio/data.json) ---
     async function loadDataFromGithubAPI() {
         try {
-            const res = await fetch('data.json?' + Date.now());
+            const res = await fetch('portfolio/data.json?' + Date.now());
             if (!res.ok) throw new Error('data.jsonが見つかりません');
             assets = await res.json();
             render();
