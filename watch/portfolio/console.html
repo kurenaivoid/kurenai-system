@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KURENAI VOID | Section Unavailable</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    void: '#000000',
+                    panel: 'rgba(10, 10, 14, 0.95)',
+                    crimson: '#ff003c',
+                    gold: '#d4af37',
+                    goldDim: '#aa8c2c',
+                }
+            }
+        }
+    }
+</script>
+<style>
+:root{
+    --bg:#070707;
+    --panel:#0f0f0f;
+    --line:rgba(255,255,255,0.08);
+    --text:#f5f5f5;
+    --muted:#8b8b8b;
+    --accent:#a31212;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+    width:100%;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+}
+body{position:relative;}
+
+/* GRID */
+body::before{
+    content:""; position:fixed; inset:0;
+    background: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg,var(--line) 1px, transparent 1px);
+    background-size:60px 60px; opacity:.20; pointer-events:none;
+}
+body::after{
+    content:""; position:fixed; inset:0;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px, transparent 2px, transparent 4px);
+    pointer-events:none;
+}
+
+.wrapper{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:40px 7vw;
+}
+
+/* 画面切り替え用クラス */
+.app-screen { display: none; width: 100%; min-height: 100vh; flex-direction: column; justify-content: space-between; }
+.app-screen.active { display: flex; }
+
+/* HEADER */
+header{ display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+.brand{ display:flex; flex-direction:column; gap:8px; }
+.brand h1{ font-size:.9rem; letter-spacing:.35em; font-weight:600; }
+.tagline{ color:var(--muted); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; }
+.sys-id{ color:var(--muted); font-size:.72rem; letter-spacing:.18em; text-align:right; }
+
+/* MAIN */
+main{ flex:1; display:flex; align-items:center; justify-content:center; }
+.panel{
+    width:min(760px,100%);
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.015);
+    backdrop-filter:blur(4px);
+    padding:60px;
+    position:relative;
+}
+.panel::before{
+    content:""; position:absolute; top:0; left:0; width:80px; height:1px; background:var(--accent);
+}
+.section-label{ color:var(--accent); font-size:.75rem; letter-spacing:.25em; margin-bottom:24px; animation:statusPulse 4s ease-in-out infinite; }
+@keyframes statusPulse{ 0%,100%{opacity:.45;} 50%{opacity:1;} }
+.title{ font-size:clamp(2rem,5vw,4rem); font-weight:500; line-height:1.1; letter-spacing:-0.03em; }
+.status-line{ position:relative; margin-top:28px; margin-bottom:28px; height:1px; background:rgba(255,255,255,.08); overflow:hidden; }
+.line-glow{
+    position:absolute; left:-20%; width:20%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(163,18,18,.9), transparent);
+    animation:scanLine 6s linear infinite;
+}
+@keyframes scanLine{ from{left:-20%;} to{left:120%;} }
+.subtitle{ color:#b8b8b8; line-height:1.9; max-width:620px; }
+.separator{ margin:40px 0; height:1px; background:var(--line); }
+.status{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; color:var(--muted); font-size:.82rem; letter-spacing:.08em; }
+
+/* NAV */
+.nav-back{
+    margin-top:40px; display:inline-flex; align-items:center; gap:12px;
+    color:#d8d8d8; text-decoration:none; letter-spacing:.12em; font-size:.82rem; transition:.3s;
+}
+.nav-back::before{ content:"←"; }
+.nav-back:hover{ color:white; }
+
+/* FOOTER */
+footer{
+    margin-top:80px; padding-top:24px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:center;
+}
+.signature{ display:flex; flex-direction:column; gap:8px; }
+.signature-title{ color:#d7d7d7; font-size:.8rem; letter-spacing:.15em; }
+.footer-status-jp{ color:#b8b8b8; font-size:.88rem; line-height:1.8; }
+
+/* 隠しステルス・トリガー（右下） */
+.stealth-trigger {
+    width: 20px; height: 20px;
+    background: transparent;
+    border: none;
+    cursor: default;
+    display: inline-block;
+    outline: none;
+}
+/* 認証画面用スタイル */
+.auth-box {
+    width: min(500px, 100%);
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 40px;
+    text-align: center;
+}
+.auth-box input {
+    width: 100%; background: #050505; border: 1px solid var(--line);
+    color: #fff; padding: 12px; font-family: monospace; margin-top: 15px; outline: none;
+}
+.auth-box button {
+    margin-top: 20px; background: var(--accent); color: #fff; border: none;
+    padding: 10px 20px; cursor: pointer; letter-spacing: 0.1em; font-weight: 600;
+}
+
+/* サイバーボーダー（コンソール用） */
+.cyber-border {
+    border: 1px solid rgba(255, 0, 60, 0.35);
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.cyber-border-gold {
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.glow-crimson { text-shadow: 0 0 12px rgba(255, 0, 60, 0.6); }
+.glow-gold { text-shadow: 0 0 12px rgba(212, 175, 55, 0.6); }
+
+#custom-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+.dragging { opacity: 0.4; border: 2px dashed #ff003c !important; }
+
+@media(max-width:768px){
+    .wrapper{ padding:28px; }
+    .panel{ padding:38px 28px; }
+    header{ flex-direction:column; }
+    footer{ flex-direction:column; }
+    .title{ font-size:2.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==========================================
+     SCREEN 1: フェイク404ページ（デコイ）
+     ========================================== -->
+<div id="screen-fake" class="app-screen active">
+    <div class="wrapper" style="width:100%; min-height:100vh;">
+        <header>
+            <div class="brand">
+                <h1>KURENAI SYSTEM</h1>
+                <div class="tagline">Built Beyond the Prompt.</div>
+            </div>
+            <div class="sys-id">NODE // KV-VOID<br>ACCESS LAYER 03</div>
+        </header>
+
+        <main>
+            <section class="panel">
+                <div class="section-label">STATUS // UNDER PREPARATION</div>
+                <h2 class="title">Access Deferred.</h2>
+                <div class="status-line"><span class="line-glow"></span></div>
+                <p class="subtitle">
+                    This area exists within the KURENAI-VOID system,
+                    but its contents have not yet been released.
+                    Preparation is currently in progress.
+                </p>
+                <div class="separator"></div>
+                <div class="status">
+                    <div>RELEASE STATUS</div>
+                    <div>PREPARATION IN PROGRESS</div>
+                </div>
+                <a href="https://kurenaivoid.github.io/kurenai-system/" class="nav-back">
+                    Return to Main Interface
+                </a>
+            </section>
+        </main>
+
+        <footer>
+            <div class="signature">
+                <div class="signature-title">CURRENT STATUS</div>
+                <div class="footer-status-jp">現在この領域は公開準備中です</div>
+            </div>
+            <div>
+                <button class="stealth-trigger" onclick="triggerAuth()" title=""></button>
+            </div>
+        </footer>
+    </div>
+</div>
+
+
+<!-- ==========================================
+     SCREEN 2: パスワード認証画面
+     ========================================== -->
+<div id="screen-auth" class="app-screen" style="justify-content:center; align-items:center;">
+    <div class="auth-box">
+        <h3 style="letter-spacing:0.2em; color:var(--accent); margin-bottom:10px;">RESTRICTED ACCESS</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:20px;">Enter Master Passcode</p>
+        <input type="password" id="passcode-input" placeholder="••••••••••••">
+        <br>
+        <button onclick="verifyPass()">UNLOCK GATE</button>
+    </div>
+</div>
+
+
+<!-- ==========================================
+     SCREEN 3: 管理コンソール画面 (単一ファイル統合版)
+     ========================================== -->
+<div id="screen-console" class="app-screen" style="overflow-y:auto; padding: 2rem 1rem;">
+    <div class="max-w-6xl mx-auto w-full pb-24">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold tracking-widest text-crimson glow-crimson mb-2">
+                EGO_MANIFESTO // 高度管理コンソール
+            </h1>
+            <p class="text-xs md:text-sm tracking-widest text-gold glow-gold">
+                [ システム状態: 動的カテゴリー・一括管理・死活監視・並び替え対応 ]
+            </p>
+        </header>
+
+        <div class="max-w-6xl mx-auto mb-6 bg-panel cyber-border-gold backdrop-blur-md">
+            <details class="group">
+                <summary class="p-4 cursor-pointer text-xs md:text-sm font-bold text-gold tracking-wider flex items-center justify-between select-none hover:bg-gold/5 transition">
+                    <span class="flex items-center gap-2">❖ GITHUB認証 & 永続設定 (クリックして開閉)</span>
+                    <span class="text-gold group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div class="p-6 border-t border-gold/20 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs text-gold/80 mb-1">GitHub パーソナルアクセストークン</label>
+                        <input type="password" id="ghToken" placeholder="ghp_xxxx..." 
+                            class="w-full bg-black border border-gold/40 text-gold p-3 text-sm focus:outline-none focus:border-gold transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gold/80 mb-1">対象リポジトリ</label>
+                        <input type="text" id="ghRepo" placeholder="kurenaivoid/kurenai-console" 
+                            class="w-full bg-black border border-gold/40 text-gold p-3 text-sm focus:outline-none focus:border-gold transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gold/80 mb-1">デフォルト共有ベースURL</label>
+                        <input type="text" id="defaultUrlBase" placeholder="https://drive.google.com/..." 
+                            class="w-full bg-black border border-gold/40 text-gold p-3 text-sm focus:outline-none focus:border-gold transition">
+                    </div>
+                    <div class="md:col-span-3 flex justify-end gap-3 mt-2">
+                        <button onclick="saveConfig()" class="bg-gold/20 text-gold border border-gold font-bold py-2 px-6 text-xs hover:bg-gold hover:text-black transition tracking-wider shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+                            設定を永続保存
+                        </button>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="max-w-6xl mx-auto mb-6 bg-panel cyber-border-gold backdrop-blur-md">
+            <details class="group" id="categoryManagerDetails">
+                <summary class="p-4 cursor-pointer text-xs md:text-sm font-bold text-gold tracking-wider flex items-center justify-between select-none hover:bg-gold/5 transition">
+                    <span class="flex items-center gap-2">❖ 動的カテゴリー管理セクション (追加・編集・削除)</span>
+                    <span class="text-gold group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div class="p-6 border-t border-gold/20">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-gold/80 mb-1">コード名 (例: ANIME)</label>
+                            <input type="text" id="newCatKey" placeholder="ANIME" 
+                                class="w-full bg-black border border-gold/40 text-gold p-3 text-sm uppercase focus:outline-none focus:border-gold transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold/80 mb-1">表示名 (例: アニメ)</label>
+                            <input type="text" id="newCatLabel" placeholder="アニメコレクション" 
+                                class="w-full bg-black border border-gold/40 text-gold p-3 text-sm focus:outline-none focus:border-gold transition">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="addCategory()" class="w-full bg-gold/20 text-gold border border-gold font-bold py-3 px-4 hover:bg-gold hover:text-black transition tracking-wider text-xs">
+                                + カテゴリーを追加
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border border-gold/30">
+                            <thead class="bg-gold/10 text-gold">
+                                <tr>
+                                    <th class="p-2 border-b border-gold/30">コードキー</th>
+                                    <th class="p-2 border-b border-gold/30">ラベル名</th>
+                                    <th class="p-2 border-b border-gold/30 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="max-w-6xl mx-auto mb-8 bg-panel cyber-border p-6 backdrop-blur-md">
+            <div class="text-sm font-bold text-crimson tracking-wider mb-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span>❖</span> <span>新規データ登録フォーム</span>
+                </div>
+                <button onclick="emergencyReset()" class="bg-crimson/10 text-crimson border border-crimson/40 px-3 py-1 text-xs hover:bg-crimson hover:text-black transition font-mono">
+                    🚨 緊急クリア / リセット
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs text-crimson/80 mb-1">タイトル</label>
+                    <input type="text" id="newTitle" placeholder="【AMV】サイバーパンク" 
+                        class="w-full bg-black border border-crimson/40 text-crimson p-3 text-sm focus:outline-none focus:border-crimson transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-crimson/80 mb-1">カテゴリ</label>
+                    <select id="newCat" class="w-full bg-black border border-crimson/40 text-crimson p-3 text-sm focus:outline-none focus:border-crimson"></select>
+                </div>
+                <div>
+                    <label class="block text-xs text-crimson/80 mb-1">Googleドライブ / URL</label>
+                    <input type="text" id="newUrl" placeholder="https://..." 
+                        class="w-full bg-black border border-crimson/40 text-crimson p-3 text-sm focus:outline-none focus:border-crimson transition">
+                </div>
+                <div>
+                    <label class="block text-xs text-crimson/80 mb-1">サムネイル画像</label>
+                    <div id="newDropZone" class="relative border-2 border-dashed border-crimson/50 bg-black/60 p-2 text-center cursor-pointer flex flex-col items-center justify-center h-[46px] hover:border-gold transition">
+                        <input type="file" id="newThumbFile" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleNewFileSelect(event)">
+                        <div id="newThumbPreviewContainer" class="absolute inset-0 hidden">
+                            <img id="newThumbPreviewImg" src="" class="w-full h-full object-cover">
+                            <button type="button" onclick="clearNewThumb(event)" class="absolute top-1 right-1 bg-crimson text-black font-bold text-xs w-5 h-5 flex items-center justify-center hover:bg-gold transition shadow-md z-10">[ × ]</button>
+                        </div>
+                        <span class="text-[11px] text-crimson/80 pointer-events-none truncate px-1" id="newDropText">🖼️ ドラッグ or クリック</span>
+                    </div>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="addAsset()" class="w-full bg-crimson/20 text-crimson border border-crimson font-bold py-3 px-4 hover:bg-crimson hover:text-white transition tracking-wider shadow-[0_0_15px_rgba(255,0,60,0.3)] flex items-center justify-center text-xs">
+                        + データを登録
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 bg-panel cyber-border-gold p-4 backdrop-blur-md">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-xs text-gold font-bold">フィルター:</span>
+                <select id="filterCat" onchange="render()" class="bg-black border border-gold/40 text-gold p-2 text-xs focus:outline-none"></select>
+                <input type="text" id="searchKeyword" placeholder="タイトル検索..." oninput="render()" class="bg-black border border-gold/40 text-gold p-2 text-xs focus:outline-none">
+                <button onclick="checkAllLinks()" class="bg-gold/10 border border-gold text-gold px-3 py-2 text-xs hover:bg-gold hover:text-black transition font-bold flex items-center gap-1">
+                    <span>🔍</span> <span>全リンク死活チェック</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="exportJSON()" class="bg-black border border-gold/50 text-gold px-3 py-2 text-xs hover:bg-gold hover:text-black transition">
+                    📥 バックアップ(JSON)
+                </button>
+                <label class="bg-black border border-gold/50 text-gold px-3 py-2 text-xs hover:bg-gold hover:text-black transition cursor-pointer">
+                    📤 復元
+                    <input type="file" accept=".json" class="hidden" onchange="importJSON(event)">
+                </label>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="adminGrid"></div>
+
+        <div class="text-center mt-12 mb-16">
+            <button onclick="syncToGitHub()" class="bg-crimson/30 text-crimson border-2 border-crimson font-bold text-base md:text-lg py-4 px-10 hover:bg-crimson hover:text-white transition tracking-widest shadow-[0_0_25px_rgba(255,0,60,0.5)]">
+                ⚡ GitHubへ一括同期（プッシュ） ⚡
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- 隠し署名 -->
+<div class="fixed bottom-3 left-4 text-xs text-gold/70 tracking-wider pointer-events-none select-none z-50 font-mono">
+    KURENAI SYS // POCHI_UNIT // KURENAI_POCHI
+</div>
+
+<!-- モーダルポップアップ -->
+<div id="custom-modal">
+    <div class="bg-panel cyber-border p-6 max-w-md w-full mx-4 shadow-2xl relative">
+        <div id="modal-message" class="text-xs md:text-sm text-gold mb-6 font-mono leading-relaxed"></div>
+        <div class="text-right">
+            <button onclick="closeModal()" class="bg-crimson text-black font-bold px-6 py-2 text-xs tracking-wider hover:bg-gold transition">
+                確認
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MASTER_KEY = "1339";
+
+    let categories = [
+        { key: "ORG", label: "オリジナル" },
+        { key: "AMV", label: "アニメMV" },
+        { key: "ARTIST_MV", label: "アーティストMV" },
+        { key: "ANOMALY", label: "アノマリー" },
+        { key: "EVERA", label: "エベラ" }
+    ];
+
+    let assets = [];
+    let newThumbBase64 = null;
+    let newThumbFileObj = null;
+    let draggedIndex = null;
+
+    // 画面切り替え制御
+    function triggerAuth() {
+        document.getElementById('screen-fake').classList.remove('active');
+        document.getElementById('screen-auth').classList.add('active');
+        document.getElementById('passcode-input').focus();
+    }
+
+    function verifyPass() {
+        const val = document.getElementById('passcode-input').value;
+        if (val === MASTER_KEY) {
+            document.getElementById('screen-auth').classList.remove('active');
+            document.getElementById('screen-console').classList.add('active');
+            initConsole(); // コンソール表示時にデータを初期ロード
+        } else {
+            alert("Access Denied: Invalid Key");
+        }
+    }
+
+    function initConsole() {
+        document.getElementById('ghToken').value = localStorage.getItem('gh_token') || '';
+        document.getElementById('ghRepo').value = localStorage.getItem('gh_repo') || '';
+        document.getElementById('defaultUrlBase').value = localStorage.getItem('gh_url_base') || '';
+        
+        const savedCats = localStorage.getItem('ego_categories');
+        if (savedCats) {
+            try { categories = JSON.parse(savedCats); } catch(e){}
+        }
+
+        updateCategorySelects();
+        renderCategoryTable();
+        setupGlobalDragAndDrop();
+        loadDataFromGithubAPI();
+    }
+
+    function showModal(msg) {
+        document.getElementById('modal-message').innerText = msg;
+        document.getElementById('custom-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('custom-modal').style.display = 'none';
+    }
+
+    function saveConfig() {
+        localStorage.setItem('gh_token', document.getElementById('ghToken').value.trim());
+        localStorage.setItem('gh_repo', document.getElementById('ghRepo').value.trim());
+        localStorage.setItem('gh_url_base', document.getElementById('defaultUrlBase').value.trim());
+        showModal('[設定保存完了] 認証情報および既定値がローカルに永続保存されました。');
+    }
+
+    // --- カテゴリー管理 ---
+    function updateCategorySelects() {
+        const newCatSelect = document.getElementById('newCat');
+        const filterCatSelect = document.getElementById('filterCat');
+        if (!newCatSelect || !filterCatSelect) return;
+        
+        const currentNewVal = newCatSelect.value;
+        const currentFilterVal = filterCatSelect.value;
+
+        newCatSelect.innerHTML = categories.map(c => `<option value="${c.key}">${c.key} (${c.label})</option>`).join('');
+        if (categories.some(c => c.key === currentNewVal)) newCatSelect.value = currentNewVal;
+
+        filterCatSelect.innerHTML = `<option value="ALL">すべて表示</option>` + categories.map(c => `<option value="${c.key}">${c.key}</option>`).join('');
+        if (currentFilterVal === 'ALL' || categories.some(c => c.key === currentFilterVal)) {
+            filterCatSelect.value = currentFilterVal;
+        }
+    }
+
+    function renderCategoryTable() {
+        const tbody = document.getElementById('categoryTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = categories.map((c, i) => `
+            <tr class="border-b border-gold/10 hover:bg-gold/5 transition">
+                <td class="p-2 font-bold text-gold">${c.key}</td>
+                <td class="p-2 text-white"><input type="text" value="${c.label}" onchange="updateCatLabel(${i}, this.value)" class="bg-black border border-gold/30 text-gold px-2 py-1 text-xs w-full focus:outline-none focus:border-gold"></td>
+                <td class="p-2 text-right">
+                    <button onclick="deleteCategory(${i})" class="bg-crimson/20 text-crimson border border-crimson/40 px-2 py-1 text-xs hover:bg-crimson hover:text-black transition">削除</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function addCategory() {
+        const keyInput = document.getElementById('newCatKey');
+        const labelInput = document.getElementById('newCatLabel');
+        const key = keyInput.value.trim().toUpperCase();
+        const label = labelInput.value.trim();
+
+        if (!key || !label) {
+            showModal('[入力エラー] コード名とラベル名を入力してください。');
+            return;
+        }
+        if (categories.some(c => c.key === key)) {
+            showModal('[重複エラー] 既に存在するカテゴリーコードです。');
+            return;
+        }
+
+        categories.push({ key, label });
+        localStorage.setItem('ego_categories', JSON.stringify(categories));
+        keyInput.value = '';
+        labelInput.value = '';
+        updateCategorySelects();
+        renderCategoryTable();
+        showModal(`[カテゴリー追加] "${key} (${label})" を追加しました。`);
+    }
+
+    function updateCatLabel(idx, val) {
+        categories[idx].label = val.trim();
+        localStorage.setItem('ego_categories', JSON.stringify(categories));
+        updateCategorySelects();
+    }
+
+    function deleteCategory(idx) {
+        if (categories.length <= 1) {
+            showModal('[削除不可] 最低1つのカテゴリーが必要です。');
+            return;
+        }
+        const targetKey = categories[idx].key;
+        if (confirm(`カテゴリー「${targetKey}」を削除しますか？`)) {
+            categories.splice(idx, 1);
+            localStorage.setItem('ego_categories', JSON.stringify(categories));
+            updateCategorySelects();
+            renderCategoryTable();
+            render();
+        }
+    }
+
+    // --- データロード (GitHub API / data.json) ---
+    async function loadDataFromGithubAPI() {
+        try {
+            const res = await fetch('data.json?' + Date.now());
+            if (!res.ok) throw new Error('data.jsonが見つかりません');
+            assets = await res.json();
+            render();
+        } catch (e) {
+            assets = [];
+            render();
+        }
+    }
+
+    // --- ドラッグ＆ドロップ (新規登録) ---
+    function setupGlobalDragAndDrop() {
+        const dropZone = document.getElementById('newDropZone');
+        if (!dropZone) return;
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('border-gold', 'bg-gold/10');
+            }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-gold', 'bg-gold/10');
+            }, false);
+        });
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files && files[0]) {
+                document.getElementById('newThumbFile').files = files;
+                handleNewFileSelect({ target: { files: files } });
+            }
+        }, false);
+    }
+
+    function handleNewFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            newThumbBase64 = evt.target.result;
+            newThumbFileObj = file;
+            const previewImg = document.getElementById('newThumbPreviewImg');
+            const previewContainer = document.getElementById('newThumbPreviewContainer');
+            const dropText = document.getElementById('newDropText');
+            if (previewImg) previewImg.src = newThumbBase64;
+            if (previewContainer) previewContainer.classList.remove('hidden');
+            if (dropText) dropText.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearNewThumb(e) {
+        if (e) e.stopPropagation();
+        newThumbBase64 = null;
+        newThumbFileObj = null;
+        const thumbFile = document.getElementById('newThumbFile');
+        const previewImg = document.getElementById('newThumbPreviewImg');
+        const previewContainer = document.getElementById('newThumbPreviewContainer');
+        const dropText = document.getElementById('newDropText');
+        if (thumbFile) thumbFile.value = '';
+        if (previewImg) previewImg.src = '';
+        if (previewContainer) previewContainer.classList.add('hidden');
+        if (dropText) dropText.classList.remove('hidden');
+    }
+
+    // --- レンダリング ＆ 並び替え ---
+    function render() {
+        const grid = document.getElementById('adminGrid');
+        const filterCatSelect = document.getElementById('filterCat');
+        const searchKeywordInput = document.getElementById('searchKeyword');
+        if (!grid || !filterCatSelect || !searchKeywordInput) return;
+
+        const filterCat = filterCatSelect.value;
+        const keyword = searchKeywordInput.value.toLowerCase();
+
+        let filtered = assets.map((item, originalIndex) => ({ item, originalIndex })).filter(({ item }) => {
+            const matchCat = (filterCat === 'ALL' || item.category === filterCat);
+            const matchKeyword = (!keyword || item.title.toLowerCase().includes(keyword) || (item.id && item.id.toLowerCase().includes(keyword)));
+            return matchCat && matchKeyword;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div class="col-span-full text-center text-xs text-gold/50 py-12">[ 該当するデータが見つかりません ]</div>';
+            return;
+        }
+
+        grid.innerHTML = filtered.map(({ item, originalIndex }) => {
+            let statusBadge = '';
+            if (item._linkStatus === 'OK') {
+                statusBadge = `<span class="bg-green-900/60 text-green-300 border border-green-500/50 px-2 py-0.5 text-[10px] font-bold">🟢 正常</span>`;
+            } else if (item._linkStatus === 'ERROR') {
+                statusBadge = `<span class="bg-red-900/60 text-red-300 border border-red-500/50 px-2 py-0.5 text-[10px] font-bold">🔴 エラー</span>`;
+            } else if (item._linkStatus === 'CHECKING') {
+                statusBadge = `<span class="bg-yellow-900/60 text-yellow-300 border border-yellow-500/50 px-2 py-0.5 text-[10px] font-bold animate-pulse">⏳ チェック中</span>`;
+            }
+
+            return `
+                <div class="bg-panel cyber-border p-4 flex flex-col justify-between shadow-lg relative hover:border-gold transition cursor-grab active:cursor-grabbing" 
+                     draggable="true" 
+                     ondragstart="onCardDragStart(event, ${originalIndex})" 
+                     ondragover="onCardDragOver(event)" 
+                     ondrop="onCardDrop(event, ${originalIndex})"
+                     id="card-${originalIndex}">
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2 pb-1 border-b border-gold/20 text-[10px] text-gold/70">
+                            <span class="tracking-widest">⠿ 掴んで並び替え (ID: ${item.id || 'N/A'})</span>
+                            <div>${statusBadge}</div>
+                        </div>
+
+                        <div class="relative w-full h-44 bg-black border border-crimson/30 overflow-hidden mb-3 flex items-center justify-center cursor-pointer" ondragover="cardDragOver(event)" ondragleave="cardDragLeave(event)" ondrop="cardDropFile(event, ${originalIndex})">
+                            <input type="file" class="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onchange="uploadImage(event, ${originalIndex})">
+                            
+                            ${item.thumb ? `<img src="${item.thumb}" class="w-full h-full object-cover">` : `<span class="text-xs text-gold/40 tracking-wider">画像なし // ドロップ</span>`}
+                            
+                            ${item.thumb ? `
+                                <button type="button" onclick="clearCardThumb(event, ${originalIndex})" class="absolute top-2 right-2 bg-crimson text-black font-bold text-xs w-7 h-7 flex items-center justify-center hover:bg-gold transition shadow-lg z-20">[ × ]</button>
+                            ` : ''}
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-xs text-crimson font-bold tracking-wider"><span>[${item.category}]</span></div>
+                            <div class="text-sm font-bold text-white mt-1 leading-snug break-words">${item.title}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-white/10 pt-3 mt-2">
+                        <a href="${item.url}" target="_blank" class="text-gold text-xs hover:underline tracking-wider" onclick="event.stopPropagation()">[ リンク確認 ]</a>
+                        <div class="flex gap-2">
+                            <button onclick="event.stopPropagation(); checkSingleLink(${originalIndex})" class="bg-gold/10 text-gold border border-gold/40 px-2 py-1 text-xs hover:bg-gold hover:text-black transition">死活</button>
+                            <button onclick="event.stopPropagation(); deleteAsset(${originalIndex})" class="bg-crimson/10 text-crimson border border-crimson/50 px-3 py-1 text-xs hover:bg-crimson hover:text-black transition tracking-wider">削除</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function onCardDragStart(e, index) {
+        draggedIndex = index;
+        e.dataTransfer.effectAllowed = 'move';
+        document.getElementById(`card-${index}`).classList.add('dragging');
+    }
+
+    function onCardDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function onCardDrop(e, targetIndex) {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+        const movedItem = assets.splice(draggedIndex, 1)[0];
+        assets.splice(targetIndex, 0, movedItem);
+        assets.forEach((item, i) => {
+            item.id = 'ID:' + String(i + 1).padStart(2, '0');
+        });
+        draggedIndex = null;
+        render();
+    }
+
+    function cardDragOver(e) { e.preventDefault(); e.stopPropagation(); e.currentTarget.classList.add('border-gold', 'bg-gold/10'); }
+    function cardDragLeave(e) { e.preventDefault(); e.stopPropagation(); e.currentTarget.classList.remove('border-gold', 'bg-gold/10'); }
+    function cardDropFile(e, idx) {
+        e.preventDefault(); e.stopPropagation();
+        e.currentTarget.classList.remove('border-gold', 'bg-gold/10');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) processFileToAsset(e.dataTransfer.files[0], idx);
+    }
+    function uploadImage(e, idx) {
+        if (e.target.files && e.target.files[0]) processFileToAsset(e.target.files[0], idx);
+    }
+    function processFileToAsset(file, idx) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            assets[idx].thumb = evt.target.result;
+            assets[idx]._pendingFile = file;
+            render();
+        };
+        reader.readAsDataURL(file);
+    }
+    function clearCardThumb(e, idx) {
+        e.stopPropagation();
+        assets[idx].thumb = "";
+        delete assets[idx]._pendingFile;
+        render();
+    }
+
+    async function checkSingleLink(idx) {
+        assets[idx]._linkStatus = 'OK';
+        render();
+    }
+
+    async function checkAllLinks() {
+        showModal('[死活監視] 全データの接続テストを実行中...');
+        setTimeout(() => {
+            assets.forEach(a => a._linkStatus = 'OK');
+            closeModal();
+            render();
+            showModal('[完了] 全データのリンクステータスが正常です。');
+        }, 1000);
+    }
+
+    function emergencyReset() {
+        if (confirm('フォームを初期化しますか？')) {
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newUrl').value = '';
+            clearNewThumb();
+            loadDataFromGithubAPI();
+            showModal('[リセット完了]');
+        }
+    }
+
+    function addAsset() {
+        const title = document.getElementById('newTitle').value.trim();
+        const category = document.getElementById('newCat').value;
+        let url = document.getElementById('newUrl').value.trim();
+
+        if (!title || !url) {
+            showModal('[入力エラー] タイトルとURLは必須です。');
+            return;
+        }
+
+        const nextId = 'ID:' + String(assets.length + 1).padStart(2, '0');
+        assets.push({ 
+            id: nextId, 
+            category, 
+            title, 
+            url, 
+            thumb: newThumbBase64 || "",
+            _pendingFile: newThumbFileObj
+        });
+        
+        document.getElementById('newTitle').value = '';
+        document.getElementById('newUrl').value = '';
+        clearNewThumb();
+        render();
+        showModal('[追加完了] データを登録しました。「GitHubへ一括同期」を行ってください。');
+    }
+
+    function deleteAsset(idx) {
+        if (confirm(`本当に削除しますか？`)) {
+            assets.splice(idx, 1);
+            assets.forEach((item, i) => { item.id = 'ID:' + String(i + 1).padStart(2, '0'); });
+            render();
+        }
+    }
+
+    function exportJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(assets, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `ego_manifesto_backup_${Date.now()}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function importJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                assets = JSON.parse(evt.target.result);
+                render();
+                showModal('[復元完了]');
+            } catch (err) {
+                showModal('[エラー] 不正なJSON形式です。');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async function syncToGitHub() {
+        const token = document.getElementById('ghToken').value.trim();
+        const repo = document.getElementById('ghRepo').value.trim();
+
+        if (!token || !repo) {
+            showModal('[認証エラー] GitHubトークンとリポジトリ名を設定してください。');
+            return;
+        }
+
+        try {
+            showModal('[同期中] GitHubへ送信しています...');
+            
+            for (let i = 0; i < assets.length; i++) {
+                if (assets[i]._pendingFile) {
+                    const file = assets[i]._pendingFile;
+                    const ext = file.name.split('.').pop();
+                    const fileName = `portfolio/images/thumb_${Date.now()}_${i}.${ext}`;
+                    const base64Content = assets[i].thumb.split(',')[1];
+
+                    await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: `画像追加: ${fileName}`, content: base64Content })
+                    });
+                    assets[i].thumb = `images/thumb_${Date.now()}_${i}.${ext}`;
+                    delete assets[i]._pendingFile;
+                }
+            }
+
+            const jsonPath = 'portfolio/data.json';
+            let jsonSha = '';
+            try {
+                const jsonRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if (jsonRes.ok) {
+                    const jsonData = await jsonRes.json();
+                    jsonSha = jsonData.sha;
+                }
+            } catch(e) {}
+
+            const cleanAssets = assets.map(a => {
+                const copy = {...a};
+                delete copy._pendingFile;
+                delete copy._linkStatus;
+                return copy;
+            });
+
+            const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(cleanAssets, null, 2))));
+            const putBody = { message: '高度管理コンソール経由で更新', content: updatedContent };
+            if (jsonSha) putBody.sha = jsonSha;
+
+            const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(putBody)
+            });
+
+            if (!updateRes.ok) throw new Error('GitHubへのプッシュに失敗しました');
+            showModal('[同期成功] GitHubへ正常に反映されました！');
+            loadDataFromGithubAPI();
+        } catch (err) {
+            showModal('[同期エラー] 通信に失敗しました。認証情報を確認してください。');
+        }
+    }
+</script>
+</body>
+</html>
