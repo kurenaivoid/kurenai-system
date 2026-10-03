@@ -409,8 +409,11 @@ footer{
 <div id="custom-modal">
     <div class="bg-panel cyber-border p-6 max-w-md w-full mx-4 shadow-2xl relative">
         <div id="modal-message" class="text-xs md:text-sm text-gold mb-6 font-mono leading-relaxed"></div>
-        <div class="text-right">
-            <button onclick="closeModal()" class="bg-crimson text-black font-bold px-6 py-2 text-xs tracking-wider hover:bg-gold transition">
+        <div class="text-right flex justify-end gap-2">
+            <button id="modal-cancel" onclick="closeModal()" class="hidden bg-black text-gold border border-gold/50 font-bold px-5 py-2 text-xs tracking-wider hover:bg-gold hover:text-black transition">
+                キャンセル
+            </button>
+            <button id="modal-confirm" onclick="closeModal()" class="bg-crimson text-black font-bold px-6 py-2 text-xs tracking-wider hover:bg-gold transition">
                 確認
             </button>
         </div>
@@ -432,6 +435,7 @@ footer{
     let newThumbBase64 = null;
     let newThumbFileObj = null;
     let draggedIndex = null;
+    let confirmCallback = null;
 
     // 画面切り替え制御
     function triggerAuth() {
@@ -468,12 +472,34 @@ footer{
     }
 
     function showModal(msg) {
+        const cancelBtn = document.getElementById('modal-cancel');
+        const confirmBtn = document.getElementById('modal-confirm');
         document.getElementById('modal-message').innerText = msg;
+        cancelBtn.classList.add('hidden');
+        confirmBtn.textContent = '確認';
+        confirmBtn.onclick = closeModal;
+        confirmCallback = null;
+        document.getElementById('custom-modal').style.display = 'flex';
+    }
+
+    function showConfirmModal(msg, callback) {
+        const cancelBtn = document.getElementById('modal-cancel');
+        const confirmBtn = document.getElementById('modal-confirm');
+        document.getElementById('modal-message').innerText = msg;
+        cancelBtn.classList.remove('hidden');
+        confirmBtn.textContent = '実行する';
+        confirmCallback = callback;
+        confirmBtn.onclick = () => {
+            const action = confirmCallback;
+            closeModal();
+            if (typeof action === 'function') action();
+        };
         document.getElementById('custom-modal').style.display = 'flex';
     }
 
     function closeModal() {
         document.getElementById('custom-modal').style.display = 'none';
+        confirmCallback = null;
     }
 
     function saveConfig() {
@@ -677,13 +703,8 @@ footer{
                         </div>
 
                         <div class="relative w-full h-44 bg-black border border-crimson/30 overflow-hidden mb-3 flex items-center justify-center cursor-pointer" ondragover="cardDragOver(event)" ondragleave="cardDragLeave(event)" ondrop="cardDropFile(event, ${originalIndex})">
-                            <input type="file" class="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onchange="uploadImage(event, ${originalIndex})">
-                            
-                            ${item.thumb ? `<img src="${item.thumb}" class="w-full h-full object-cover">` : `<span class="text-xs text-gold/40 tracking-wider">画像なし // ドロップ</span>`}
-                            
-                            ${item.thumb ? `
-                                <button type="button" onclick="clearCardThumb(event, ${originalIndex})" class="absolute top-2 right-2 bg-crimson text-black font-bold text-xs w-7 h-7 flex items-center justify-center hover:bg-gold transition shadow-lg z-20">[ × ]</button>
-                            ` : ''}
+                            <input type="file" id="cardImageFile-${originalIndex}" class="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onchange="uploadImage(event, ${originalIndex})">
+                            ${item.thumb ? `<img src="${item.thumb}" class="w-full h-full object-cover">` : `<span class="text-xs text-gold/40 tracking-wider">画像なし // 画像を選択・ドロップ</span>`}
                         </div>
 
                         <div class="mb-3">
@@ -694,10 +715,16 @@ footer{
 
                     <div class="flex items-center justify-between border-t border-white/10 pt-3 mt-2">
                         <a href="${item.url}" target="_blank" class="text-gold text-xs hover:underline tracking-wider" onclick="event.stopPropagation()">[ リンク確認 ]</a>
-                        <div class="flex gap-2">
-                            <button onclick="event.stopPropagation(); checkSingleLink(${originalIndex})" class="bg-gold/10 text-gold border border-gold/40 px-2 py-1 text-xs hover:bg-gold hover:text-black transition">死活</button>
-                            <button onclick="event.stopPropagation(); deleteAsset(${originalIndex})" class="bg-crimson/10 text-crimson border border-crimson/50 px-3 py-1 text-xs hover:bg-crimson hover:text-black transition tracking-wider">削除</button>
-                        </div>
+                        <details class="relative" onclick="event.stopPropagation()">
+                            <summary class="cursor-pointer list-none bg-black/40 text-gold border border-gold/40 px-3 py-1 text-xs hover:bg-gold hover:text-black transition tracking-wider select-none">[ 操作 ▼ ]</summary>
+                            <div class="absolute right-0 bottom-full mb-2 z-30 min-w-[190px] bg-[#0a0a0a] border border-gold/40 p-2 shadow-2xl space-y-2" onclick="event.stopPropagation()">
+                                <button type="button" onclick="event.stopPropagation(); selectCardImage(${originalIndex})" class="w-full bg-gold/10 text-gold border border-gold/40 px-3 py-2 text-xs hover:bg-gold hover:text-black transition text-left">🖼 画像を選択</button>
+                                <button type="button" onclick="event.stopPropagation(); registerCardImage(${originalIndex})" class="w-full bg-crimson/10 text-crimson border border-crimson/50 px-3 py-2 text-xs hover:bg-crimson hover:text-white transition text-left">⬆ 画像を登録</button>
+                                ${item.thumb ? `<button type="button" onclick="event.stopPropagation(); clearCardThumb(${originalIndex})" class="w-full bg-black text-gold border border-gold/30 px-3 py-2 text-xs hover:bg-gold hover:text-black transition text-left">画像を解除</button>` : ''}
+                                <button type="button" onclick="event.stopPropagation(); checkSingleLink(${originalIndex})" class="w-full bg-gold/10 text-gold border border-gold/40 px-3 py-2 text-xs hover:bg-gold hover:text-black transition text-left">🔍 死活チェック</button>
+                                <button type="button" onclick="event.stopPropagation(); deleteAsset(${originalIndex})" class="w-full bg-crimson/10 text-crimson border border-crimson/50 px-3 py-2 text-xs hover:bg-crimson hover:text-black transition text-left">⚠ データを削除</button>
+                            </div>
+                        </details>
                     </div>
                 </div>
             `;
@@ -734,23 +761,121 @@ footer{
         e.currentTarget.classList.remove('border-gold', 'bg-gold/10');
         if (e.dataTransfer.files && e.dataTransfer.files[0]) processFileToAsset(e.dataTransfer.files[0], idx);
     }
-    function uploadImage(e, idx) {
-        if (e.target.files && e.target.files[0]) processFileToAsset(e.target.files[0], idx);
+    function selectCardImage(idx) {
+        const input = document.getElementById(`cardImageFile-${idx}`);
+        if (input) input.click();
     }
+
+    function uploadImage(e, idx) {
+        if (e.target.files && e.target.files[0]) {
+            processFileToAsset(e.target.files[0], idx);
+        }
+        e.target.value = '';
+    }
+
     function processFileToAsset(file, idx) {
+        if (!file || !file.type.startsWith('image/')) {
+            showModal('[画像エラー] 画像ファイルを選択してください。');
+            return;
+        }
         const reader = new FileReader();
         reader.onload = function(evt) {
             assets[idx].thumb = evt.target.result;
             assets[idx]._pendingFile = file;
             render();
+            showModal('[画像選択完了] 「操作」→「画像を登録」でGitHubへ反映できます。');
         };
         reader.readAsDataURL(file);
     }
-    function clearCardThumb(e, idx) {
-        e.stopPropagation();
-        assets[idx].thumb = "";
-        delete assets[idx]._pendingFile;
-        render();
+
+    function clearCardThumb(idx) {
+        showConfirmModal(
+            `「${assets[idx].title}」の画像を解除しますか？\n\n※ 解除後、「GitHubへ一括同期」を実行するとdata.jsonから画像設定が削除されます。`,
+            () => {
+                assets[idx].thumb = "";
+                delete assets[idx]._pendingFile;
+                render();
+                showModal('[画像解除] 画像設定を解除しました。「GitHubへ一括同期」で反映してください。');
+            }
+        );
+    }
+
+    async function registerCardImage(idx) {
+        const item = assets[idx];
+        if (!item._pendingFile || !item.thumb) {
+            showModal('[画像未選択] 先に「画像を選択」または画像枠へドロップしてください。');
+            return;
+        }
+
+        const token = document.getElementById('ghToken').value.trim();
+        const repo = document.getElementById('ghRepo').value.trim();
+        if (!token || !repo) {
+            showModal('[認証エラー] GitHubトークンとリポジトリ名を設定してください。');
+            return;
+        }
+
+        try {
+            showModal('[画像登録中] GitHubへ画像とdata.jsonを反映しています...');
+
+            const file = item._pendingFile;
+            const ext = file.name.split('.').pop().toLowerCase();
+            const fileName = `watch/portfolio/images/thumb_${Date.now()}_${idx}.${ext}`;
+            const base64Content = item.thumb.split(',')[1];
+
+            const imageRes = await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: `画像登録: ${fileName}`, content: base64Content })
+            });
+
+            if (!imageRes.ok) throw new Error('画像のアップロードに失敗しました');
+
+            item.thumb = fileName.replace('watch/portfolio/', '');
+            delete item._pendingFile;
+
+            await updateDataJsonOnGitHub(token, repo, '画像登録');
+            showModal('[画像登録完了] 選択した画像をGitHubへ反映しました。');
+            loadDataFromGithubAPI();
+        } catch (err) {
+            showModal('[画像登録エラー] GitHubへの反映に失敗しました。認証情報とリポジトリ設定を確認してください。');
+        }
+    }
+
+    async function updateDataJsonOnGitHub(token, repo, message) {
+        const jsonPath = 'watch/portfolio/data.json';
+        let jsonSha = '';
+        const jsonRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        if (jsonRes.ok) {
+            const jsonData = await jsonRes.json();
+            jsonSha = jsonData.sha;
+        }
+
+        const cleanAssets = assets.map(a => {
+            const copy = {...a};
+            delete copy._pendingFile;
+            delete copy._linkStatus;
+            return copy;
+        });
+
+        const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(cleanAssets, null, 2))));
+        const putBody = { message: `高度管理コンソール: ${message}`, content: updatedContent };
+        if (jsonSha) putBody.sha = jsonSha;
+
+        const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(putBody)
+        });
+
+        if (!updateRes.ok) throw new Error('data.jsonの更新に失敗しました');
     }
 
     async function checkSingleLink(idx) {
@@ -806,11 +931,16 @@ footer{
     }
 
     function deleteAsset(idx) {
-        if (confirm(`本当に削除しますか？`)) {
-            assets.splice(idx, 1);
-            assets.forEach((item, i) => { item.id = 'ID:' + String(i + 1).padStart(2, '0'); });
-            render();
-        }
+        const target = assets[idx];
+        showConfirmModal(
+            `【データ削除確認】\n\n「${target.title}」\nID: ${target.id || 'N/A'}\n\nこのデータを一覧から削除しますか？\nこの操作は現在の管理画面上のデータから対象を削除します。`,
+            () => {
+                assets.splice(idx, 1);
+                assets.forEach((item, i) => { item.id = 'ID:' + String(i + 1).padStart(2, '0'); });
+                render();
+                showModal('[削除完了] データを削除しました。「GitHubへ一括同期」で反映してください。');
+            }
+        );
     }
 
     function exportJSON() {
@@ -871,39 +1001,7 @@ footer{
                 }
             }
 
-            const jsonPath = 'watch/portfolio/data.json';
-            let jsonSha = '';
-            try {
-                const jsonRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-                if (jsonRes.ok) {
-                    const jsonData = await jsonRes.json();
-                    jsonSha = jsonData.sha;
-                }
-            } catch(e) {}
-
-            const cleanAssets = assets.map(a => {
-                const copy = {...a};
-                delete copy._pendingFile;
-                delete copy._linkStatus;
-                return copy;
-            });
-
-            const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(cleanAssets, null, 2))));
-            const putBody = { message: '高度管理コンソール経由で更新', content: updatedContent };
-            if (jsonSha) putBody.sha = jsonSha;
-
-            const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(putBody)
-            });
-
-            if (!updateRes.ok) throw new Error('GitHubへのプッシュに失敗しました');
+            await updateDataJsonOnGitHub(token, repo, '一括同期');
             showModal('[同期成功] GitHubへ正常に反映されました！');
             loadDataFromGithubAPI();
         } catch (err) {
