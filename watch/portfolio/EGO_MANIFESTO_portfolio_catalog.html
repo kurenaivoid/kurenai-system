@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EGO_MANIFESTO // CYBERPUNK PORTFOLIO</title>
     <style>
         :root {
@@ -95,6 +96,8 @@
             overflow: hidden;
             cursor: pointer;
             transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+            text-decoration: none;
+            color: inherit;
         }
 
         .card:hover {
@@ -125,6 +128,8 @@
                 linear-gradient(rgba(255,0,60,.08) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,0,60,.08) 1px, transparent 1px);
             background-size: 15px 15px;
+            z-index: 1;
+            pointer-events: none;
         }
 
         .preview-box::after {
@@ -133,6 +138,29 @@
             inset: 0;
             background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,.4) 50%);
             background-size: 100% 3px;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .real-thumb {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2;
+        }
+
+        .thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(0,0,0,.05) 0%,
+                rgba(0,0,0,.12) 55%,
+                rgba(0,0,0,.5) 100%
+            );
+            z-index: 3;
             pointer-events: none;
         }
 
@@ -146,7 +174,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 3;
+            z-index: 2;
         }
 
         .thumb-graphic::before {
@@ -231,416 +259,306 @@
 
         .empty-note.visible { display: block; }
 
+        .loading-note {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
+            border: 1px dashed #222;
+            color: #555;
+            text-align: center;
+        }
+
+        .error-note {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
+            border: 1px dashed rgba(255,0,60,.35);
+            color: var(--accent-red);
+            text-align: center;
+            display: none;
+        }
+
         @media (max-width: 900px) {
-            .grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .grid-container {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 600px) {
-            body { padding: 30px 14px 45px; }
-            h1 { font-size: 1.8rem; letter-spacing: 3px; }
-            p.subtitle { font-size: .72rem; line-height: 1.5; }
-            .grid-container { grid-template-columns: 1fr; }
-            .tab { flex: 1 1 40%; }
+            body {
+                padding: 30px 14px 45px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                letter-spacing: 3px;
+            }
+
+            p.subtitle {
+                font-size: .72rem;
+                line-height: 1.5;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .tab {
+                flex: 1 1 40%;
+            }
         }
     </style>
 </head>
 <body>
+
     <header>
         <h1>EGO_MANIFESTO</h1>
         <p class="subtitle">CYBERPUNK MINIMALIST PORTFOLIO // HIGH-FIDELITY ARCHIVE</p>
     </header>
 
-    <div class="nav-tabs" aria-label="Asset filters">
-        <button class="tab active" data-filter="ALL">ALL ASSETS [21]</button>
-        <button class="tab" data-filter="AMV">AMV [06]</button>
-        <button class="tab" data-filter="ORG">ORG [06]</button>
-        <button class="tab" data-filter="ARTIST_MV">ARTIST_MV [07]</button>
-        <button class="tab" data-filter="ANOMALY">ANOMALY [02]</button>
-        <button class="tab" data-filter="EVERA">EVERA [00]</button>
+    <div class="nav-tabs" id="navTabs" aria-label="Asset filters"></div>
+
+    <div class="loading-note" id="loadingNote">
+        LOADING ARCHIVE...
     </div>
 
-    <div class="grid-container">
-        <a class="card" data-category="AMV" href="https://drive.google.com/file/d/1VKTtnfLtjayYv6BNQBMQqBj1vbcy1MAs/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_01">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">AMV</span>
-                    <span class="tag-id">ID:01</span>
-                </div>
-                <p class="title">【AMV】 To Be a Power in the Shadows! 陰の実力者になりたくて！</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="AMV" href="https://drive.google.com/file/d/1e-GxaCCrqHCG21Yq33uTylW5Kp5x-eoR/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_02">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">AMV</span>
-                    <span class="tag-id">ID:02</span>
-                </div>
-                <p class="title">【AMV】機動戦士ガンダム 水星の魔女』YOASOBI「祝福」</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="AMV" href="https://drive.google.com/file/d/14w78AlHWd2uK33ggLQpM43BNOz_6666j/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_03">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">AMV</span>
-                    <span class="tag-id">ID:03</span>
-                </div>
-                <p class="title">【P×AMV】 鬼滅の刃 -遊郭編 Aimer「残響散歌」</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="AMV" href="https://drive.google.com/file/d/1ThUBvVkQBv1Q1U9y8fYw3uByYFNljxSP/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_04">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">AMV</span>
-                    <span class="tag-id">ID:04</span>
-                </div>
-                <p class="title">[AMV] OVERRIDE_GHOST</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="AMV" href="https://drive.google.com/file/d/1DbtPaP_Bh8Ia2NXuNBhkJ8g0oKk_6DSD/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_05">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">AMV</span>
-                    <span class="tag-id">ID:05</span>
-                </div>
-                <p class="title">【AMV】 鬼滅の刃 遊郭編 01話 LiSA - 紅蓮華 -</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="AMV" href="https://drive.google.com/file/d/1Mp3kTg1xaS01dvt71xBdz1CJLZjvID9g/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_06">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">AMV</span>
-                    <span class="tag-id">ID:06</span>
-                </div>
-                <p class="title">【AMV】 鬼滅の刃 -遊郭編 - 鬼側視点　曲 Aimer「朝が来る」</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ORG" href="https://drive.google.com/file/d/1qVJdrABjFlGX6LqhUhyXVK64H0bEfEIw/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_07">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ORG</span>
-                    <span class="tag-id">ID:07</span>
-                </div>
-                <p class="title">[ORG] ラップが私の世界_EGO-01</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ORG" href="https://drive.google.com/file/d/1-m0eEewntiXjy3OKLkc-wNOdSGjepl5F/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_08">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ORG</span>
-                    <span class="tag-id">ID:08</span>
-                </div>
-                <p class="title">[ORG] 月影 － 深淵のセイレーン伝承 －_EGO-02</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ORG" href="https://drive.google.com/file/d/1qaNQF-hUsbHFXblNR4OxjPiPpiaGglPO/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_09">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ORG</span>
-                    <span class="tag-id">ID:09</span>
-                </div>
-                <p class="title">[ORG] Bugged Horizons_EGO-03</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ORG" href="https://drive.google.com/file/d/13urrBWy1LHVttqQf9166R3qHlVrEvd0c/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_10">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ORG</span>
-                    <span class="tag-id">ID:10</span>
-                </div>
-                <p class="title">[ORG] 翠風の精霊詩（すいふうのせいれいし）～エリンの旅～_EGO-04</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ORG" href="https://drive.google.com/file/d/1O8nGANkbvysHOPVlasd99shu0Ff6A4GI/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_11">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ORG</span>
-                    <span class="tag-id">ID:11</span>
-                </div>
-                <p class="title">[ORG] もう一人の私_EGO-05</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ORG" href="https://drive.google.com/file/d/1tCjQxhyEE6-SPrd20amcJJmbpxBP3PNf/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_12">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ORG</span>
-                    <span class="tag-id">ID:12</span>
-                </div>
-                <p class="title">[ORG] 漆黒の女神 - 渇き -_EGO-06</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/1Dtj8qP7nbeq6wCBQLuKrQ2FqN_johvLM/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_13">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:13</span>
-                </div>
-                <p class="title">【MV】Reol - 'SCORPION'</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/1d4MVsXAVc0ZitubMJqjGT_YEwf17cbFZ/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_14">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:14</span>
-                </div>
-                <p class="title">【MV】REOL（れをる ） 一心不乱 〔feat.ill.bell,nqrse</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/13qzBJH89jGOqVsPtrrWq8BKzRjEaK-QJ/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_15">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:15</span>
-                </div>
-                <p class="title">【MV】Reol - 'Q'</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/1Hkw4H3vCLOXh5zChCkkpBKW0RnnoIPDR/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_16">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:16</span>
-                </div>
-                <p class="title">【MV】Reol - おこちゃま戦争</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/1dLDNo7St4xGENS-e09gbjpdTrY8vR0rh/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_17">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:17</span>
-                </div>
-                <p class="title">【MV】GETCHA</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/1Kh5aFnW1KPvLvQgmbaKEGOypcBuIRrAl/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_18">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:18</span>
-                </div>
-                <p class="title">【MV】Iggy Azalea - Black Widow ft. Rita Ora</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ARTIST_MV" href="https://drive.google.com/file/d/1z0tYNx4ElZGD_5kUUdvfD-Xzm1ufFfmh/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_19">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ARTIST_MV</span>
-                    <span class="tag-id">ID:19</span>
-                </div>
-                <p class="title">【MV】A]ddiction</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ANOMALY" href="https://drive.google.com/file/d/1YSb1sfwdlPwVEUsxxcEQTq-2s53WusWf/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_20">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ANOMALY</span>
-                    <span class="tag-id">ID:20</span>
-                </div>
-                <p class="title">[ANOMALY] GLITCH_OCCULT_EGO-01</p>
-            </div>
-        </a>
-
-        <a class="card" data-category="ANOMALY" href="https://drive.google.com/file/d/1yLDnkit6h9b-T5umZv2qPlmSOugGHquc/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-            <div class="preview-box">
-                <div class="thumb-graphic" data-feed="CAM_FEED_21">
-                    <div class="signal-wave">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-info">
-                <div class="tag-row">
-                    <span class="tag">ANOMALY</span>
-                    <span class="tag-id">ID:21</span>
-                </div>
-                <p class="title">[ANOMALY] TUNNEL_OF_THE_DEAD_EGO-02</p>
-            </div>
-        </a>
+    <div class="error-note" id="errorNote">
+        DATA ARCHIVE UNAVAILABLE
     </div>
-    <div class="empty-note" id="emptyNote">NO ASSETS IN THIS CATEGORY</div>
+
+    <div class="grid-container" id="assetGrid"></div>
+
+    <div class="empty-note" id="emptyNote">
+        NO ASSETS IN THIS CATEGORY
+    </div>
 
     <script>
-        const tabs = document.querySelectorAll('.tab');
-        const cards = document.querySelectorAll('.card');
+        const DATA_URL = 'data.json';
+
+        let assets = [];
+        let currentFilter = 'ALL';
+
+        const navTabs = document.getElementById('navTabs');
+        const assetGrid = document.getElementById('assetGrid');
         const emptyNote = document.getElementById('emptyNote');
+        const loadingNote = document.getElementById('loadingNote');
+        const errorNote = document.getElementById('errorNote');
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const filter = tab.dataset.filter;
-                let visible = 0;
+        function escapeHTML(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
+        function normalizeThumbPath(thumb) {
+            if (!thumb) return '';
 
-                cards.forEach(card => {
-                    const show = filter === 'ALL' || card.dataset.category === filter;
-                    card.classList.toggle('is-hidden', !show);
-                    if (show) visible++;
+            const value = String(thumb).trim();
+
+            if (!value) return '';
+
+            // data:image/... のようなBase64画像
+            if (value.startsWith('data:image/')) {
+                return value;
+            }
+
+            // http / https の絶対URL
+            if (/^https?:\/\//i.test(value)) {
+                return value;
+            }
+
+            // ./ や /watch/portfolio/ などを整理
+            let path = value
+                .replace(/^\.\/+/, '')
+                .replace(/^\/+/, '');
+
+            if (path.startsWith('watch/portfolio/')) {
+                path = path.substring('watch/portfolio/'.length);
+            }
+
+            // GitHub Pagesの現在位置からの相対パス
+            return path;
+        }
+
+        function buildTabs() {
+            const categoryMap = {};
+
+            assets.forEach(item => {
+                const category = item.category || 'OTHER';
+                categoryMap[category] = (categoryMap[category] || 0) + 1;
+            });
+
+            navTabs.innerHTML = '';
+
+            const allButton = document.createElement('button');
+            allButton.className = 'tab active';
+            allButton.dataset.filter = 'ALL';
+            allButton.textContent = `ALL ASSETS [${assets.length}]`;
+            navTabs.appendChild(allButton);
+
+            Object.entries(categoryMap).forEach(([category, count]) => {
+                const button = document.createElement('button');
+                button.className = 'tab';
+                button.dataset.filter = category;
+                button.textContent = `${category} [${count}]`;
+                navTabs.appendChild(button);
+            });
+
+            navTabs.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    currentFilter = tab.dataset.filter;
+
+                    navTabs.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+
+                    tab.classList.add('active');
+
+                    renderCards();
+                });
+            });
+        }
+
+        function createFallbackGraphic(index) {
+            return `
+                <div class="thumb-graphic" data-feed="CAM_FEED_${String(index + 1).padStart(2, '0')}">
+                    <div class="signal-wave">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createCard(item, index) {
+            const category = escapeHTML(item.category || 'OTHER');
+            const title = escapeHTML(item.title || 'UNTITLED');
+            const id = escapeHTML(item.id || `ID:${String(index + 1).padStart(2, '0')}`);
+            const url = escapeHTML(item.url || '#');
+            const thumb = normalizeThumbPath(item.thumb);
+
+            let previewHTML;
+
+            if (thumb) {
+                previewHTML = `
+                    <img
+                        class="real-thumb"
+                        src="${escapeHTML(thumb)}"
+                        alt="${title}"
+                        loading="lazy"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <div class="thumb-overlay"></div>
+                    <div class="thumb-graphic" data-feed="IMAGE_FEED_${String(index + 1).padStart(2, '0')}" style="display:none;">
+                        <div class="signal-wave">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                previewHTML = createFallbackGraphic(index);
+            }
+
+            return `
+                <a
+                    class="card"
+                    data-category="${category}"
+                    href="${url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <div class="preview-box">
+                        ${previewHTML}
+                    </div>
+
+                    <div class="card-info">
+                        <div class="tag-row">
+                            <span class="tag">${category}</span>
+                            <span class="tag-id">${id}</span>
+                        </div>
+
+                        <p class="title">${title}</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        function renderCards() {
+            const filtered = assets.filter(item => {
+                return currentFilter === 'ALL' ||
+                       (item.category || 'OTHER') === currentFilter;
+            });
+
+            assetGrid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyNote.classList.add('visible');
+                return;
+            }
+
+            emptyNote.classList.remove('visible');
+
+            assetGrid.innerHTML = filtered
+                .map((item) => {
+                    const originalIndex = assets.indexOf(item);
+                    return createCard(item, originalIndex);
+                })
+                .join('');
+        }
+
+        async function loadData() {
+            loadingNote.style.display = 'block';
+            errorNote.style.display = 'none';
+            assetGrid.innerHTML = '';
+            emptyNote.classList.remove('visible');
+
+            try {
+                const response = await fetch(`${DATA_URL}?t=${Date.now()}`, {
+                    cache: 'no-store'
                 });
 
-                emptyNote.classList.toggle('visible', visible === 0);
-            });
-        });
+                if (!response.ok) {
+                    throw new Error(`data.json取得失敗 (${response.status})`);
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    throw new Error('data.jsonの形式が配列ではありません。');
+                }
+
+                assets = data;
+
+                loadingNote.style.display = 'none';
+
+                buildTabs();
+                renderCards();
+
+            } catch (error) {
+                console.error('[PORTFOLIO DATA ERROR]', error);
+
+                loadingNote.style.display = 'none';
+                errorNote.textContent =
+                    `DATA ARCHIVE UNAVAILABLE // ${error.message}`;
+
+                errorNote.style.display = 'block';
+            }
+        }
+
+        loadData();
     </script>
+
 </body>
 </html>
