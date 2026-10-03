@@ -560,10 +560,10 @@ footer{
         }
     }
 
-    // --- データロード (GitHub API / portfolio/data.json) ---
+    // --- データロード (GitHub API / data.json) ---
     async function loadDataFromGithubAPI() {
         try {
-            const res = await fetch('portfolio/data.json?' + Date.now());
+            const res = await fetch('data.json?' + Date.now());
             if (!res.ok) throw new Error('data.jsonが見つかりません');
             assets = await res.json();
             render();
@@ -855,7 +855,7 @@ footer{
                 if (assets[i]._pendingFile) {
                     const file = assets[i]._pendingFile;
                     const ext = file.name.split('.').pop();
-                    const fileName = `portfolio/images/thumb_${Date.now()}_${i}.${ext}`;
+                    const fileName = `watch/portfolio/images/thumb_${Date.now()}_${i}.${ext}`;
                     const base64Content = assets[i].thumb.split(',')[1];
 
                     await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
@@ -866,12 +866,12 @@ footer{
                         },
                         body: JSON.stringify({ message: `画像追加: ${fileName}`, content: base64Content })
                     });
-                    assets[i].thumb = `images/thumb_${Date.now()}_${i}.${ext}`;
+                    assets[i].thumb = fileName.replace('watch/portfolio/', '');
                     delete assets[i]._pendingFile;
                 }
             }
 
-            const jsonPath = 'portfolio/data.json';
+            const jsonPath = 'watch/portfolio/data.json';
             let jsonSha = '';
             try {
                 const jsonRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
