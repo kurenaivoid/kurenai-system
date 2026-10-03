@@ -703,8 +703,8 @@ footer{
                         </div>
 
                         <div class="relative w-full h-44 bg-black border border-crimson/30 overflow-hidden mb-3 flex items-center justify-center cursor-pointer" ondragover="cardDragOver(event)" ondragleave="cardDragLeave(event)" ondrop="cardDropFile(event, ${originalIndex})">
-                            <input type="file" id="cardImageFile-${originalIndex}" class="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onchange="uploadImage(event, ${originalIndex})">
-                            ${item.thumb ? `<img src="${item.thumb}" class="w-full h-full object-cover">` : `<span class="text-xs text-gold/40 tracking-wider">画像なし // 画像を選択・ドロップ</span>`}
+                            <input type="file" id="cardImageFile-${originalIndex}" class="hidden" accept="image/*" onchange="uploadImage(event, ${originalIndex})">
+                            ${item.thumb ? `<img src="${item.thumb}" class="w-full h-full object-cover pointer-events-none">` : `<span class="text-xs text-gold/40 tracking-wider pointer-events-none">画像なし // 操作から画像を選択</span>`}
                         </div>
 
                         <div class="mb-3">
@@ -763,21 +763,29 @@ footer{
     }
     function selectCardImage(idx) {
         const input = document.getElementById(`cardImageFile-${idx}`);
-        if (input) input.click();
+        if (!input) {
+            showModal('[画像選択エラー] 画像選択欄が見つかりません。');
+            return;
+        }
+        input.click();
     }
 
     function uploadImage(e, idx) {
-        if (e.target.files && e.target.files[0]) {
-            processFileToAsset(e.target.files[0], idx);
-        }
-        e.target.value = '';
+        const file = e && e.target && e.target.files ? e.target.files[0] : null;
+        if (file) processFileToAsset(file, idx);
+        if (e && e.target) e.target.value = '';
     }
 
     function processFileToAsset(file, idx) {
-        if (!file || !file.type.startsWith('image/')) {
+        if (!file || !file.type || !file.type.startsWith('image/')) {
             showModal('[画像エラー] 画像ファイルを選択してください。');
             return;
         }
+        if (!assets[idx]) {
+            showModal('[画像エラー] 対象データが見つかりません。');
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = function(evt) {
             assets[idx].thumb = evt.target.result;
@@ -785,14 +793,18 @@ footer{
             render();
             showModal('[画像選択完了] 「操作」→「画像を登録」でGitHubへ反映できます。');
         };
+        reader.onerror = function() {
+            showModal('[画像エラー] 画像の読み込みに失敗しました。');
+        };
         reader.readAsDataURL(file);
     }
 
     function clearCardThumb(idx) {
+        if (!assets[idx]) return;
         showConfirmModal(
             `「${assets[idx].title}」の画像を解除しますか？\n\n※ 解除後、「GitHubへ一括同期」を実行するとdata.jsonから画像設定が削除されます。`,
             () => {
-                assets[idx].thumb = "";
+                assets[idx].thumb = '';
                 delete assets[idx]._pendingFile;
                 render();
                 showModal('[画像解除] 画像設定を解除しました。「GitHubへ一括同期」で反映してください。');
@@ -802,8 +814,12 @@ footer{
 
     async function registerCardImage(idx) {
         const item = assets[idx];
-        if (!item._pendingFile || !item.thumb) {
-            showModal('[画像未選択] 先に「画像を選択」または画像枠へドロップしてください。');
+        if (!item) {
+            showModal('[画像登録エラー] 対象データが見つかりません。');
+            return;
+        }
+        if (!item._pendingFile || !item.thumb || !item.thumb.includes(',')) {
+            showModal('[画像未選択] 先に「画像を選択」または画像枠へ画像をドロップしてください。');
             return;
         }
 
@@ -818,42 +834,59 @@ footer{
             showModal('[画像登録中] GitHubへ画像とdata.jsonを反映しています...');
 
             const file = item._pendingFile;
-            const ext = file.name.split('.').pop().toLowerCase();
+            const nameParts = file.name.split('.');
+            const ext = (nameParts.length > 1 ? nameParts.pop() : 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
             const fileName = `watch/portfolio/images/thumb_${Date.now()}_${idx}.${ext}`;
-            const base64Content = item.thumb.split(',')[1];
+            const commaIndex = item.thumb.indexOf(',');
+            const base64Content = item.thumb.slice(commaIndex + 1);
 
             const imageRes = await fetch(`https://api.github.com/repos/${repo}/contents/${fileName}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github+json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: `画像登録: ${fileName}`, content: base64Content })
+                body: JSON.stringify({
+                    message: `画像登録: ${fileName}`,
+                    content: base64Content
+                })
             });
 
-            if (!imageRes.ok) throw new Error('画像のアップロードに失敗しました');
+            if (!imageRes.ok) {
+                const detail = await imageRes.text().catch(() => '');
+                throw new Error(`画像アップロード失敗 (${imageRes.status}) ${detail}`);
+            }
 
             item.thumb = fileName.replace('watch/portfolio/', '');
             delete item._pendingFile;
 
             await updateDataJsonOnGitHub(token, repo, '画像登録');
+            render();
             showModal('[画像登録完了] 選択した画像をGitHubへ反映しました。');
-            loadDataFromGithubAPI();
+            await loadDataFromGithubAPI();
         } catch (err) {
-            showModal('[画像登録エラー] GitHubへの反映に失敗しました。認証情報とリポジトリ設定を確認してください。');
+            console.error(err);
+            showModal('[画像登録エラー] GitHubへの反映に失敗しました。トークン・リポジトリ名・権限を確認してください。');
         }
     }
 
     async function updateDataJsonOnGitHub(token, repo, message) {
         const jsonPath = 'watch/portfolio/data.json';
         let jsonSha = '';
-        const jsonRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
-            headers: { 'Authorization': `token ${token}` }
+
+        const jsonRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}?t=${Date.now()}`, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github+json'
+            }
         });
-        if (jsonRes.ok) {
-            const jsonData = await jsonRes.json();
-            jsonSha = jsonData.sha;
+        if (!jsonRes.ok) {
+            throw new Error(`data.json取得失敗 (${jsonRes.status})`);
         }
+
+        const jsonData = await jsonRes.json();
+        jsonSha = jsonData.sha;
 
         const cleanAssets = assets.map(a => {
             const copy = {...a};
@@ -863,19 +896,26 @@ footer{
         });
 
         const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(cleanAssets, null, 2))));
-        const putBody = { message: `高度管理コンソール: ${message}`, content: updatedContent };
-        if (jsonSha) putBody.sha = jsonSha;
+        const putBody = {
+            message: `高度管理コンソール: ${message}`,
+            content: updatedContent,
+            sha: jsonSha
+        };
 
         const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${jsonPath}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github+json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(putBody)
         });
 
-        if (!updateRes.ok) throw new Error('data.jsonの更新に失敗しました');
+        if (!updateRes.ok) {
+            const detail = await updateRes.text().catch(() => '');
+            throw new Error(`data.json更新失敗 (${updateRes.status}) ${detail}`);
+        }
     }
 
     async function checkSingleLink(idx) {
