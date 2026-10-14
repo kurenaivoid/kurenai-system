@@ -3,119 +3,334 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#090a0b">
+<meta name="theme-color" content="#050608">
 <meta name="description" content="YAUTJA WRIST SYSTEM — Yautja文字と異星の戦術端末をモチーフにした無料ブラウザ・ビジュアルジェネレーター。インストール不要でWebから体験。">
 <title>YAUTJA WRIST SYSTEM // KURENAI VOID</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
-  --bg:#090a0b;--panel:#101214;--panel2:#151719;--line:#38312b;
-  --red:#a51f2a;--red2:#ef3945;--gold:#c7a36b;--text:#e9e4dc;
-  --muted:#a09a90;--dim:#5e5b55;--green:#9baf8c;
-  --mono:Consolas,"SFMono-Regular",Menlo,monospace;
+  --bg:#050608;
+  --panel:rgba(12,14,19,0.85);
+  --line:rgba(255,255,255,.1);
+  --line-bright:rgba(230,57,70,.4);
+  --text:#f0f2f5;
+  --muted:#7a8291;
+  --red:#c01e25;
+  --red-bright:#e63946;
+  --red-glow:rgba(230,57,70,0.6);
+  --green-glow:#00ff66;
+  --gold:#c7a36b;
+  --mono:'JetBrains Mono',monospace;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans JP",sans-serif;line-height:1.7}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;opacity:.11;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.045) 4px),linear-gradient(90deg,transparent 49.9%,rgba(199,163,107,.07) 50%,transparent 50.1%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+body{position:relative}
+
+/* 起動時オーバーレイ（シネマティックブート） */
+.boot-screen{
+    position:fixed;inset:0;background:#000;z-index:9999;
+    display:flex;align-items:center;justify-content:center;
+    animation:bootFade .8s cubic-bezier(0.16,1,0.3,1) .4s forwards;
+    pointer-events:none;
+}
+.boot-text{
+    font-family:var(--mono);font-size:.8rem;color:var(--red-bright);
+    letter-spacing:.3em;text-shadow:0 0 12px var(--red-glow);
+    animation:bootText .8s steps(3) forwards;
+}
+@keyframes bootFade{to{opacity:0;visibility:hidden}}
+@keyframes bootText{0%{opacity:1}100%{opacity:0}}
+
+/* 動的サイバーグリッド背景 */
+body::before{
+    content:"";position:fixed;inset:0;
+    background:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg,var(--line) 1px, transparent 1px);
+    background-size:56px 56px;
+    opacity:.18;pointer-events:none;
+}
+
+/* 呼吸するアンビエントグラデーション ＆ スキャンライン */
+body::after{
+    content:"";position:fixed;inset:0;
+    background:
+        radial-gradient(circle at 50% -20%, rgba(230,57,70,0.15) 0%, transparent 70%),
+        repeating-linear-gradient(180deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.5) 3px, rgba(0,0,0,0.5) 4px);
+    pointer-events:none;
+    animation:ambientPulse 8s ease-in-out infinite alternate;
+}
+@keyframes ambientPulse{
+    0%{opacity:0.8}
+    100%{opacity:1;transform:scale(1.02)}
+}
+
+.wrapper{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;
+    padding:32px 5vw;max-width:1400px;margin:0 auto;position:relative;z-index:1;
+    animation:wrapperIn 1s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes wrapperIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+/* HEADER (Master) */
+header.site-header{
+    display:flex;justify-content:space-between;align-items:center;gap:20px;
+    padding-bottom:20px;border-bottom:1px solid var(--line);position:relative;
+}
+header.site-header::after{
+    content:"";position:absolute;bottom:-1px;left:0;width:180px;height:1px;
+    background:linear-gradient(90deg, var(--red-bright), transparent);
+    box-shadow:0 0 12px var(--red-glow);
+    animation:laserMove 4s ease-in-out infinite alternate;
+}
+@keyframes laserMove{
+    0%{left:0;width:120px}
+    100%{left:60%;width:240px}
+}
+
+.header-brand{
+    display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);
+}
+
+.logo-box{
+    width:38px;height:38px;
+    background:linear-gradient(135deg, #e63946 0%, #700d11 100%);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:1.05rem;color:#fff;
+    border:1px solid var(--red-bright);
+    box-shadow:0 0 16px var(--red-glow), inset 0 0 8px rgba(255,255,255,0.4);
+    clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    transition:all .3s cubic-bezier(0.16,1,0.3,1);
+}
+.header-brand:hover .logo-box{
+    transform:scale(1.1) rotate(3deg);
+    box-shadow:0 0 25px var(--red-bright), inset 0 0 12px #fff;
+}
+
+.brand-text{display:flex;flex-direction:column;gap:3px}
+.brand-title{
+    font-size:1rem;font-weight:700;letter-spacing:0.25em;
+    text-shadow:0 0 10px rgba(230,57,70,0.5);
+    font-family:var(--mono);
+}
+.brand-sub{
+    font-size:.62rem;color:var(--muted);letter-spacing:.18em;
+    text-transform:uppercase;font-family:var(--mono);
+}
+
+.header-nav{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.header-nav a{
+    color:var(--muted);text-decoration:none;font-size:.68rem;font-weight:600;
+    letter-spacing:.15em;padding:8px 14px;border:1px solid var(--line);
+    background:rgba(12,14,19,0.7);backdrop-filter:blur(6px);
+    transition:all .25s cubic-bezier(0.16,1,0.3,1);position:relative;
+    clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%);
+    font-family:var(--mono);
+}
+.header-nav a::before{
+    content:"";position:absolute;top:0;left:0;width:2px;height:0;background:var(--red-bright);
+    transition:height .2s ease;
+}
+.header-nav a:hover{
+    color:#fff;border-color:var(--red-bright);background:rgba(230,57,70,0.18);
+    box-shadow:0 0 15px var(--red-glow), inset 0 0 5px rgba(230,57,70,0.3);
+    transform:translateY(-2px);
+}
+.header-nav a:hover::before{height:100%}
+
+/* MAIN CONTENT (YAUTJA LANDING SPECIFIC) */
+main{flex:1}
 a{color:inherit}
-button,a{ -webkit-tap-highlight-color:transparent}
+button,a{-webkit-tap-highlight-color:transparent}
 a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
-.wrap{width:min(1160px,calc(100% - 40px));margin:auto}
-.topbar{height:56px;border-bottom:1px solid #292623;display:flex;align-items:center;justify-content:space-between;gap:20px;font:11px var(--mono);letter-spacing:.14em;color:var(--muted)}
-.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:bold;letter-spacing:.16em}
-.brand-mark{width:20px;height:20px;border:1px solid var(--red2);transform:rotate(45deg);display:grid;place-items:center}
-.brand-mark:after{content:"";width:7px;height:7px;background:var(--red2)}
-.top-status{display:flex;align-items:center;gap:9px}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.wrap{width:100%;margin:auto}
+
 .hero{position:relative;min-height:650px;display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:36px;padding:72px 0 82px;overflow:hidden}
-.hero:before{content:"";position:absolute;width:560px;height:560px;right:-90px;top:45px;border-radius:50%;background:radial-gradient(circle,rgba(165,31,42,.17),rgba(165,31,42,.04) 43%,transparent 70%);pointer-events:none}
+.hero:before{content:"";position:absolute;width:560px;height:560px;right:-90px;top:45px;border-radius:50%;background:radial-gradient(circle,rgba(230,57,70,.17),rgba(230,57,70,.04) 43%,transparent 70%);pointer-events:none}
 .kicker{font:11px var(--mono);letter-spacing:.2em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:12px}
-.kicker:before{content:"";width:32px;height:1px;background:var(--red2)}
+.kicker:before{content:"";width:32px;height:1px;background:var(--red-bright)}
 h1{font-size:clamp(42px,6vw,76px);line-height:.98;letter-spacing:-.055em;margin:23px 0 20px;font-weight:900}
-h1 span{display:block;color:var(--red2);font-size:.56em;letter-spacing:.11em;margin-top:15px;font-family:var(--mono);font-weight:500}
+h1 span{display:block;color:var(--red-bright);font-size:.56em;letter-spacing:.11em;margin-top:15px;font-family:var(--mono);font-weight:500}
 .lead{max-width:510px;color:#c4beb5;font-size:16px;line-height:1.95}
 .lead strong{color:var(--text);font-weight:700}
 .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin:25px 0 30px}
-.tag{border:1px solid #4b4035;color:#c9bda9;padding:5px 9px;font:10px var(--mono);letter-spacing:.09em}
+.tag{border:1px solid #4b4035;color:#c9bda9;padding:5px 9px;font:10px var(--mono);letter-spacing:.09em;clip-path:polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 0 100%);}
 .actions{display:flex;flex-wrap:wrap;gap:12px}
-.btn{display:inline-flex;justify-content:center;align-items:center;gap:12px;min-height:48px;padding:0 18px;text-decoration:none;font:700 12px var(--mono);letter-spacing:.08em;border:1px solid var(--red);transition:.2s ease}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:12px;min-height:48px;padding:0 18px;text-decoration:none;font:700 12px var(--mono);letter-spacing:.08em;border:1px solid var(--red);transition:.2s ease;clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);}
 .btn-primary{background:var(--red);color:#fff}
-.btn-primary:hover{background:#c02a36;transform:translateY(-2px)}
+.btn-primary:hover{background:#c02a36;transform:translateY(-2px);box-shadow:0 0 15px var(--red-glow)}
 .btn-secondary{border-color:#5a5146;color:var(--text);background:#121313}
 .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
 .btn .arrow{font-size:18px}
-.hero-note{margin-top:18px;color:var(--dim);font:10px var(--mono);letter-spacing:.06em}
+.hero-note{margin-top:18px;color:var(--muted);font:10px var(--mono);letter-spacing:.06em}
+
 .visual{position:relative;min-height:440px;display:grid;place-items:center}
 .visual-frame{position:relative;width:min(100%,500px);aspect-ratio:1/1;display:grid;place-items:center}
 .visual-frame:before,.visual-frame:after{content:"";position:absolute;inset:8%;border:1px solid rgba(199,163,107,.27);transform:rotate(45deg)}
-.visual-frame:after{inset:17%;border-color:rgba(165,31,42,.4);transform:rotate(0deg)}
+.visual-frame:after{inset:17%;border-color:rgba(230,57,70,.4);transform:rotate(0deg)}
 .crosshair{position:absolute;width:90%;height:90%;border:1px dashed rgba(199,163,107,.22);border-radius:50%}
 .crosshair:before,.crosshair:after{content:"";position:absolute;background:rgba(199,163,107,.35)}
 .crosshair:before{width:1px;height:100%;left:50%}.crosshair:after{height:1px;width:100%;top:50%}
 .device{z-index:1;position:relative;width:74%;padding:16px;background:linear-gradient(145deg,#343431,#151718 30%,#080909 70%,#4b4035);border:1px solid #7a6a53;clip-path:polygon(7% 0,93% 0,100% 8%,100% 92%,92% 100%,8% 100%,0 92%,0 8%);box-shadow:0 22px 55px #000}
 .device-inner{border:1px solid #5b4037;background:linear-gradient(135deg,#1a1111,#090b0c 60%);padding:15px}
 .device-head{display:flex;justify-content:space-between;color:var(--gold);font:9px var(--mono);letter-spacing:.13em;border-bottom:1px solid #49342f;padding-bottom:10px}
-.device-screen{margin:14px 0;border:1px solid #55262a;min-height:185px;padding:14px;background:radial-gradient(ellipse at 50% 45%,rgba(165,31,42,.22),transparent 66%),#090a0a;position:relative;overflow:hidden}
+.device-screen{margin:14px 0;border:1px solid #55262a;min-height:185px;padding:14px;background:radial-gradient(ellipse at 50% 45%,rgba(230,57,70,.22),transparent 66%),#090a0a;position:relative;overflow:hidden}
 .screen-label{font:9px var(--mono);color:#b67a6e;letter-spacing:.15em}
 .glyphs{font-family:var(--mono);font-size:clamp(20px,3vw,33px);line-height:1.4;letter-spacing:.2em;color:#e7b0a0;text-shadow:0 0 12px rgba(239,57,69,.5);margin:14px 0}
-.scan{height:2px;position:absolute;left:0;right:0;top:45%;background:var(--red2);box-shadow:0 0 13px var(--red2);opacity:.75;animation:scan 4s ease-in-out infinite}
-@keyframes scan{0%,100%{top:10%;opacity:.25}50%{top:90%;opacity:.9}}
+.scan{height:2px;position:absolute;left:0;right:0;top:45%;background:var(--red-bright);box-shadow:0 0 13px var(--red-bright);opacity:.75;animation:scanAnim 4s ease-in-out infinite}
+@keyframes scanAnim{0%,100%{top:10%;opacity:.25}50%{top:90%;opacity:.9}}
 .device-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .stat{border:1px solid #37312c;padding:8px;text-align:center}
 .stat small{display:block;color:#887d70;font:8px var(--mono);letter-spacing:.1em}
 .stat b{display:block;color:var(--gold);font:12px var(--mono);margin-top:3px}
 .corner{position:absolute;color:#817563;font:9px var(--mono);letter-spacing:.1em}
 .c1{top:9%;left:0}.c2{top:18%;right:-1%}.c3{bottom:12%;left:0}.c4{bottom:7%;right:0}
-.section{padding:78px 0;border-top:1px solid #282522}
+
+.section{padding:78px 0;border-top:1px solid var(--line)}
 .section-head{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:30px}
-.eyebrow{color:var(--red2);font:10px var(--mono);letter-spacing:.18em}
+.eyebrow{color:var(--red-bright);font:10px var(--mono);letter-spacing:.18em}
 h2{font-size:clamp(26px,3.4vw,42px);line-height:1.15;margin:9px 0 0;letter-spacing:-.035em}
 .section-intro{max-width:440px;color:var(--muted);font-size:13px;margin:0}
 .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.feature{background:linear-gradient(145deg,#151616,#0e0f10);border:1px solid #302b26;padding:23px;min-height:190px;position:relative}
-.feature-no{font:10px var(--mono);color:var(--red2);letter-spacing:.14em}
+.feature{background:linear-gradient(145deg,#151616,#0e0f10);border:1px solid #302b26;padding:23px;min-height:190px;position:relative;clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);}
+.feature-no{font:10px var(--mono);color:var(--red-bright);letter-spacing:.14em}
 .feature-icon{width:36px;height:36px;border:1px solid #554237;display:grid;place-items:center;color:var(--gold);margin:17px 0 12px;font:16px var(--mono)}
 .feature h3{font-size:16px;margin:0 0 8px}.feature p{font-size:12px;color:var(--muted);margin:0;line-height:1.8}
-.demo-band{display:grid;grid-template-columns:1fr auto;align-items:center;gap:25px;padding:30px;border:1px solid #5a2c2f;background:linear-gradient(100deg,rgba(165,31,42,.18),rgba(17,18,19,.95) 68%);position:relative;overflow:hidden}
+
+.demo-band{display:grid;grid-template-columns:1fr auto;align-items:center;gap:25px;padding:30px;border:1px solid #5a2c2f;background:linear-gradient(100deg,rgba(230,57,70,.18),rgba(17,18,19,.95) 68%);position:relative;overflow:hidden}
 .demo-band:after{content:"";position:absolute;right:130px;top:-55px;width:160px;height:160px;border:1px solid rgba(199,163,107,.2);transform:rotate(45deg);pointer-events:none}
 .demo-band h3{font-size:22px;margin:0 0 6px}.demo-band p{font-size:12px;color:var(--muted);margin:0}
+
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;counter-reset:step}
 .step{border-top:1px solid #655042;padding:16px 15px;background:#101112;counter-increment:step}
-.step:before{content:"0" counter(step);display:block;color:var(--red2);font:12px var(--mono);margin-bottom:18px}
+.step:before{content:"0" counter(step);display:block;color:var(--red-bright);font:12px var(--mono);margin-bottom:18px}
 .step h3{font-size:14px;margin:0 0 8px}.step p{font-size:12px;color:var(--muted);margin:0;line-height:1.8}
+
 .notice{display:grid;grid-template-columns:150px 1fr;gap:20px;border:1px solid #39332b;padding:22px;background:#101112}
 .notice-label{font:10px var(--mono);letter-spacing:.15em;color:var(--gold)}
-.notice p{font-size:12px;color:var(--muted);margin:0}
+.notice p{font-size:12px;color:var(--muted);margin:0;line-height:1.8}
+
 .download{padding:50px 0 72px}
-.download-panel{border:1px solid #594238;padding:clamp(24px,5vw,48px);background:radial-gradient(ellipse at 100% 0,rgba(165,31,42,.17),transparent 45%),#111213;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.download-panel{border:1px solid #594238;padding:clamp(24px,5vw,48px);background:radial-gradient(ellipse at 100% 0,rgba(230,57,70,.17),transparent 45%),#111213;display:flex;align-items:center;justify-content:space-between;gap:30px}
 .download-panel h2{margin:8px 0 12px}.download-panel p{color:var(--muted);font-size:13px;max-width:550px;margin:0}
 .download-actions{display:flex;flex-direction:column;gap:10px;min-width:220px}
-.credits{border-top:1px solid #292623;padding:25px 0 32px;color:#807a70;font-size:11px}
-.credits-row{display:flex;justify-content:space-between;gap:20px;align-items:start}
-.credits a{color:#c9bda9}
-.footer-brand{font:11px var(--mono);letter-spacing:.12em;color:#c4b7a4}
-.footer-small{font:9px var(--mono);color:#5f5b55;margin-top:10px;letter-spacing:.07em}
+
+/* FOOTER (Master 4-Column) */
+footer.site-footer{
+    margin-top:60px;border-top:1px solid var(--line);padding-top:24px;
+    display:grid;
+    grid-template-columns:minmax(0, .85fr) minmax(0, 1.55fr);
+    grid-template-rows:auto auto;
+    column-gap:36px;row-gap:0;align-items:start;
+    position:relative;min-width:0;
+}
+footer.site-footer::before{
+    content:"";position:absolute;top:-1px;right:0;width:120px;height:1px;
+    background:var(--red-bright);box-shadow:0 0 10px var(--red-glow);
+}
+
+.footer-brand-col{grid-column:1;grid-row:1;display:flex;align-items:flex-start;gap:14px;max-width:360px;min-width:0}
+.footer-logo{
+    flex:0 0 42px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:1.15rem;background:linear-gradient(135deg,#e63946 0%,#700d11 100%);
+    border:1px solid var(--red-bright);box-shadow:0 0 14px rgba(230,57,70,.22);
+    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
+}
+.footer-brand-copy{display:flex;flex-direction:column;gap:7px}
+.footer-signature{
+    font-size:.82rem;letter-spacing:.12em;color:#fff;font-weight:700;
+    font-family:var(--mono);text-shadow:0 0 8px rgba(255,255,255,0.2);
+}
+.footer-tagline{font-size:.68rem;color:var(--red-bright);letter-spacing:.12em;font-family:var(--mono)}
+.footer-description{font-size:.78rem;line-height:1.8;color:var(--muted);max-width:330px}
+.footer-grid{
+    grid-column:2;grid-row:1 / 3;min-width:0;
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;
+    padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.footer-column{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0}
+.footer-heading{font-family:var(--mono);color:var(--red-bright);font-size:.68rem;letter-spacing:.14em;font-weight:700}
+.footer-column-title{font-size:.82rem;color:#fff;font-weight:600;letter-spacing:.04em;margin-bottom:2px}
+.footer-column a,.footer-column .footer-static{
+    color:var(--muted);text-decoration:none;font-size:.72rem;letter-spacing:.04em;line-height:1.5;
+    font-family:var(--mono);transition:color .2s,transform .2s;
+}
+.footer-column a:hover{color:#fff;text-shadow:0 0 8px var(--red-glow);transform:translateX(2px)}
+.footer-contact-note{font-family:'Inter',sans-serif!important;letter-spacing:0!important;line-height:1.7!important}
+.footer-bottom{grid-column:1;grid-row:2;width:100%;min-width:0;display:flex;justify-content:flex-start;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-top:20px}
+.footer-copyright,.footer-meta{color:var(--muted);font-size:.66rem;letter-spacing:.08em;text-align:left;line-height:1.8;font-family:var(--mono);max-width:100%;overflow-wrap:anywhere}
+.footer-meta{color:var(--muted);font-size:.66rem;letter-spacing:.12em;text-align:left;line-height:1.8;font-family:var(--mono)}
+.footer-meta-label{color:#fff}
+.status-indicator{display:inline-flex;align-items:center;gap:6px;color:#fff;font-weight:700}
+.dot{
+    width:7px;height:7px;background:var(--green-glow);border-radius:50%;
+    box-shadow:0 0 10px var(--green-glow),0 0 20px var(--green-glow);animation:hardPulse 1.2s infinite;
+}
+@keyframes hardPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.7)}}
+
+@media(max-width:900px){
+    .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 22px}
+}
 @media(max-width:800px){
- .hero{grid-template-columns:1fr;padding:54px 0 60px;gap:10px}.hero-copy{position:relative;z-index:2}.visual{min-height:330px}.visual-frame{max-width:390px}
- .section-head{display:block}.section-intro{margin-top:15px}.feature-grid{grid-template-columns:1fr}.feature{min-height:0}
- .steps{grid-template-columns:repeat(2,1fr)}.demo-band{grid-template-columns:1fr}.demo-band .btn{justify-self:start}
- .download-panel{display:block}.download-actions{margin-top:25px;max-width:360px}.notice{grid-template-columns:1fr;gap:8px}
+  .hero{grid-template-columns:1fr;padding:54px 0 60px;gap:10px}.hero-copy{position:relative;z-index:2}.visual{min-height:330px}.visual-frame{max-width:390px}
+  .section-head{display:block}.section-intro{margin-top:15px}.feature-grid{grid-template-columns:1fr}.feature{min-height:0}
+  .steps{grid-template-columns:repeat(2,1fr)}.demo-band{grid-template-columns:1fr}.demo-band .btn{justify-self:start}
+  .download-panel{display:block}.download-actions{margin-top:25px;max-width:360px}.notice{grid-template-columns:1fr;gap:8px}
+}
+@media(max-width:768px){
+    .wrapper{padding:20px 16px}
+    header.site-header{flex-direction:column;align-items:flex-start;gap:16px}
+    .header-nav{width:100%;gap:6px}
+    .header-nav a{font-size:.64rem;padding:8px 10px}
+    footer.site-footer{display:flex;flex-direction:column;gap:24px}
+    .footer-brand-col,.footer-grid,.footer-bottom{grid-column:auto;grid-row:auto}
+    .footer-grid{width:100%;padding:24px 0;gap:24px 16px}
+    .footer-bottom{align-items:flex-start;flex-direction:column;padding-top:0}
+    .footer-meta{text-align:left}
 }
 @media(max-width:480px){
- .wrap{width:min(100% - 28px,1160px)}.topbar{height:50px}.top-status{font-size:9px}.hero{padding-top:42px}
- h1{font-size:43px}.lead{font-size:14px}.visual{min-height:280px}.device{width:81%;padding:10px}.device-inner{padding:10px}.device-screen{min-height:150px}
- .steps{grid-template-columns:1fr 1fr}.step{padding:13px 11px}.section{padding:56px 0}.credits-row{display:block}.credits-row>div+div{margin-top:15px}
- .btn{width:100%}.actions{display:grid;grid-template-columns:1fr}
+  .wrap{width:100%}.hero{padding-top:42px}
+  h1{font-size:43px}.lead{font-size:14px}.visual{min-height:280px}.device{width:81%;padding:10px}.device-inner{padding:10px}.device-screen{min-height:150px}
+  .steps{grid-template-columns:1fr 1fr}.step{padding:13px 11px}.section{padding:56px 0}
+  .btn{width:100%}.actions{display:grid;grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scan{animation:none}}
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
-    <a class="brand" href="#top" aria-label="KURENAI VOID top"><span class="brand-mark"></span><span>KURENAI VOID</span></a>
-    <div class="top-status"><span class="status-dot"></span><span>FIELD SYSTEM // PUBLIC ACCESS</span></div>
-  </div>
+
+<!-- 起動時ブート演出 -->
+<div class="boot-screen">
+    <div class="boot-text">INITIALIZING KURENAI_SYS... OK</div>
+</div>
+
+<div class="wrapper">
+
+<!-- 共通ヘッダー -->
+<header class="site-header">
+    <a href="https://kurenaivoid.github.io/kurenai-system/" class="header-brand">
+        <div class="logo-box">紅</div>
+        <div class="brand-text">
+            <span class="brand-title">KURENAI SYSTEM</span>
+            <span class="brand-sub">SYS_CORE // V2.6_ACTIVE</span>
+        </div>
+    </a>
+    <nav class="header-nav" aria-label="メインナビゲーション">
+        <a href="https://kurenaivoid.github.io/kurenai-system/">TOP</a>
+        <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/">AI SYSTEMS</a>
+        <a href="https://kurenaivoid.github.io/kurenai-system/about/">ABOUT</a>
+        <a href="https://kurenaivoid.github.io/kurenai-system/read/">NOTE</a>
+        <a href="https://kurenaivoid.base.shop/" target="_blank" rel="noopener noreferrer">BASE ↗</a>
+        <a href="https://x.com/kurenai_void" target="_blank" rel="noopener noreferrer">X ↗</a>
+        <a href="https://www.youtube.com/channel/UCjFaTeeWuWpzYTSee1kk_pQ/videos?app=desktop" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+    </nav>
 </header>
 
 <main id="top">
@@ -210,7 +425,7 @@ h2{font-size:clamp(26px,3.4vw,42px);line-height:1.15;margin:9px 0 0;letter-spaci
         <div class="notice-label">IMPORTANT NOTE</div>
         <p>録画形式や動作はブラウザ・端末によって異なります。公開版の表示・動作が想定どおりか確認してから制作に利用してください。本ページおよびツールは非公式のファンメイド作品であり、映画シリーズの権利元とは関係ありません。<strong style="color:#e9e4dc">このツールで使用しているYautjaフォントには、作者クレジットの記載が必要です。</strong> フォントを利用・再配布する場合は、元配布ページでライセンス条件を確認し、必要な表示を維持してください。</p>
       </div>
-      <div class="notice" style="margin-top:12px;border-color:#69433a;background:linear-gradient(110deg,rgba(165,31,42,.09),#101112)">
+      <div class="notice" style="margin-top:12px;border-color:#69433a;background:linear-gradient(110deg,rgba(230,57,70,.09),#101112)">
         <div class="notice-label">FONT ATTRIBUTION</div>
         <div>
           <p style="color:#e9e4dc;font-weight:700;margin-bottom:8px">Yautja — font by mxz123</p>
@@ -240,11 +455,66 @@ h2{font-size:clamp(26px,3.4vw,42px);line-height:1.15;margin:9px 0 0;letter-spaci
   </section>
 </main>
 
-<footer class="credits">
-  <div class="wrap credits-row">
-    <div><div class="footer-brand">KURENAI VOID / FIELD SYSTEMS</div><div class="footer-small">UNOFFICIAL FAN-MADE TOOL // NO AFFILIATION WITH THE FILM RIGHTS HOLDERS</div></div>
-    <div>Font credit: <a href="https://fontstruct.com/fontstructions/show/333947" target="_blank" rel="noopener">“Yautja” by mxz123</a> · <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a><br><span style="color:#5f5b55">Font attribution is required. Review the license before modifying or redistributing the font.</span></div>
-  </div>
+<!-- 共通フッター -->
+<footer class="site-footer" aria-label="サイトフッター">
+    <div class="footer-brand-col">
+        <div class="footer-logo" aria-hidden="true">紅</div>
+        <div class="footer-brand-copy">
+            <div class="footer-signature">KURENAI SYSTEM</div>
+            <div class="footer-tagline">BUILT BEYOND THE PROMPT.</div>
+            <p class="footer-description">AI・Web・プロンプトを軸に、システムやアプリケーション、関連コンテンツを探求・公開するプロジェクト。</p>
+        </div>
+    </div>
+
+    <div class="footer-grid">
+        <section class="footer-column" aria-label="システム">
+            <div class="footer-heading">01 // EXPLORE</div>
+            <div class="footer-column-title">SYSTEMS</div>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/">AI SYSTEMS</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/applications/">APPLICATIONS</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/porta-web/">PORTA-WEB</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/prompts/">PROMPTS</a>
+        </section>
+
+        <section class="footer-column" aria-label="コンテンツ">
+            <div class="footer-heading">02 // DISCOVER</div>
+            <div class="footer-column-title">CONTENTS</div>
+            <a href="https://kurenaivoid.github.io/kurenai-system/read/">READ / ARTICLES</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/watch/">WATCH / VIDEOS</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/about/">ABOUT THE PROJECT</a>
+        </section>
+
+        <section class="footer-column" aria-label="公式リンク">
+            <div class="footer-heading">03 // CONNECT</div>
+            <div class="footer-column-title">OFFICIAL LINKS</div>
+            <a href="https://kurenaivoid.base.shop/" target="_blank" rel="noopener noreferrer">BASE / OFFICIAL SHOP ↗</a>
+            <a href="https://x.com/kurenai_void" target="_blank" rel="noopener noreferrer">X / SOCIAL ↗</a>
+            <a href="https://www.youtube.com/channel/UCjFaTeeWuWpzYTSee1kk_pQ/videos?app=desktop" target="_blank" rel="noopener noreferrer">YouTube / CHANNEL ↗</a>
+        </section>
+
+        <section class="footer-column" aria-label="お問い合わせ">
+            <div class="footer-heading">04 // SUPPORT</div>
+            <div class="footer-column-title">CONTACT</div>
+            <span class="footer-static footer-contact-note">質問・不具合報告・各種連絡</span>
+            <a href="mailto:kurenai.void@gmail.com">kurenai.void@gmail.com</a>
+        </section>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="footer-copyright">© <span id="copyright-year">2026</span> KURENAI SYSTEM<br>ALL RIGHTS RESERVED.</div>
+        <div class="footer-meta">
+            <span class="footer-meta-label">CORE_VER:</span> 2.6<br>
+            <span class="footer-meta-label">INTERFACE:</span>
+            <span class="status-indicator"><span class="dot" aria-hidden="true"></span> READY</span>
+        </div>
+    </div>
 </footer>
+
+</div>
+
+<script>
+    const yearNode = document.getElementById('copyright-year');
+    if(yearNode) yearNode.textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
