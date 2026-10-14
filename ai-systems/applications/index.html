@@ -1,128 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>APPLICATIONS | KURENAI VOID</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
 :root{
-    --bg:#070707;
-    --panel:#0d0d0d;
-    --line:rgba(255,255,255,.08);
-    --text:#f4f4f4;
-    --muted:#8b8b8b;
-    --accent:#a31212;
+    --bg:#050608;
+    --panel:rgba(12,14,19,0.85);
+    --line:rgba(255,255,255,.1);
+    --line-bright:rgba(230,57,70,.4);
+    --text:#f0f2f5;
+    --muted:#7a8291;
+    --red:#c01e25;
+    --red-bright:#e63946;
+    --red-glow:rgba(230,57,70,0.6);
+    --green-glow:#00ff66;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+body{position:relative}
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* 起動時オーバーレイ（シネマティックブート） */
+.boot-screen{
+    position:fixed;inset:0;background:#000;z-index:9999;
+    display:flex;align-items:center;justify-content:center;
+    animation:bootFade .8s cubic-bezier(0.16,1,0.3,1) .4s forwards;
+    pointer-events:none;
 }
-
-html,body{
-    width:100%;
-    min-height:100%;
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter',sans-serif;
-    overflow-x:hidden;
+.boot-text{
+    font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--red-bright);
+    letter-spacing:.3em;text-shadow:0 0 12px var(--red-glow);
+    animation:bootText .8s steps(3) forwards;
 }
+@keyframes bootFade{to{opacity:0;visibility:hidden}}
+@keyframes bootText{0%{opacity:1}100%{opacity:0}}
 
-body{
-    position:relative;
-}
-
-/* subtle grid */
-
+/* 動的サイバーグリッド背景 */
 body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-
+    content:"";position:fixed;inset:0;
     background:
         linear-gradient(var(--line) 1px, transparent 1px),
         linear-gradient(90deg,var(--line) 1px, transparent 1px);
-
-    background-size:64px 64px;
-    opacity:.16;
-    pointer-events:none;
+    background-size:56px 56px;
+    opacity:.18;pointer-events:none;
 }
 
-/* scan texture */
-
+/* 呼吸するアンビエントグラデーション ＆ スキャンライン */
 body::after{
-    content:"";
-    position:fixed;
-    inset:0;
-
+    content:"";position:fixed;inset:0;
     background:
-    repeating-linear-gradient(
-        180deg,
-        rgba(255,255,255,.01) 0px,
-        rgba(255,255,255,.01) 1px,
-        transparent 2px,
-        transparent 4px
-    );
-
+        radial-gradient(circle at 50% -20%, rgba(230,57,70,0.15) 0%, transparent 70%),
+        repeating-linear-gradient(180deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.5) 3px, rgba(0,0,0,0.5) 4px);
     pointer-events:none;
+    animation:ambientPulse 8s ease-in-out infinite alternate;
+}
+@keyframes ambientPulse{
+    0%{opacity:0.8}
+    100%{opacity:1;transform:scale(1.02)}
 }
 
 .wrapper{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    padding:48px 7vw;
+    min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;
+    padding:32px 5vw;max-width:1400px;margin:0 auto;position:relative;z-index:1;
+    animation:wrapperIn 1s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes wrapperIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
 }
 
-/* HEADER */
-
-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:24px;
+/* HEADER (Master) */
+header.site-header{
+    display:flex;justify-content:space-between;align-items:center;gap:20px;
+    padding-bottom:20px;border-bottom:1px solid var(--line);position:relative;
+}
+header.site-header::after{
+    content:"";position:absolute;bottom:-1px;left:0;width:180px;height:1px;
+    background:linear-gradient(90deg, var(--red-bright), transparent);
+    box-shadow:0 0 12px var(--red-glow);
+    animation:laserMove 4s ease-in-out infinite alternate;
+}
+@keyframes laserMove{
+    0%{left:0;width:120px}
+    100%{left:60%;width:240px}
 }
 
-.header-left{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+.header-brand{
+    display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);
 }
 
-.page-title{
-    font-size:.95rem;
-    letter-spacing:.28em;
-    font-weight:600;
+.logo-box{
+    width:38px;height:38px;
+    background:linear-gradient(135deg, #e63946 0%, #700d11 100%);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:1.05rem;color:#fff;
+    border:1px solid var(--red-bright);
+    box-shadow:0 0 16px var(--red-glow), inset 0 0 8px rgba(255,255,255,0.4);
+    clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    transition:all .3s cubic-bezier(0.16,1,0.3,1);
+}
+.header-brand:hover .logo-box{
+    transform:scale(1.1) rotate(3deg);
+    box-shadow:0 0 25px var(--red-bright), inset 0 0 12px #fff;
 }
 
-.system-tag{
-    color:var(--muted);
-    font-size:.74rem;
-    letter-spacing:.14em;
-    text-transform:uppercase;
+.brand-text{display:flex;flex-direction:column;gap:3px}
+.brand-title{
+    font-size:1rem;font-weight:700;letter-spacing:0.25em;
+    text-shadow:0 0 10px rgba(230,57,70,0.5);
+    font-family:'JetBrains Mono',monospace;
+}
+.brand-sub{
+    font-size:.62rem;color:var(--muted);letter-spacing:.18em;
+    text-transform:uppercase;font-family:'JetBrains Mono',monospace;
 }
 
-.header-right{
-    color:var(--muted);
-    font-size:.72rem;
-    letter-spacing:.18em;
-    text-align:right;
+.header-nav{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
 }
+.header-nav a{
+    color:var(--muted);text-decoration:none;font-size:.68rem;font-weight:600;
+    letter-spacing:.15em;padding:8px 14px;border:1px solid var(--line);
+    background:rgba(12,14,19,0.7);backdrop-filter:blur(6px);
+    transition:all .25s cubic-bezier(0.16,1,0.3,1);position:relative;
+    clip-path:polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%);
+    font-family:'JetBrains Mono',monospace;
+}
+.header-nav a::before{
+    content:"";position:absolute;top:0;left:0;width:2px;height:0;background:var(--red-bright);
+    transition:height .2s ease;
+}
+.header-nav a:hover{
+    color:#fff;border-color:var(--red-bright);background:rgba(230,57,70,0.18);
+    box-shadow:0 0 15px var(--red-glow), inset 0 0 5px rgba(230,57,70,0.3);
+    transform:translateY(-2px);
+}
+.header-nav a:hover::before{height:100%}
 
-/* MAIN */
-
+/* MAIN CONTENT (APPLICATIONS SPECIFIC) */
 main{
     flex:1;
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:60px 0;
 }
 
 .language-gate{
@@ -143,10 +168,11 @@ main{
 }
 
 .section-label{
-    color:var(--accent);
+    color:var(--red-bright);
     font-size:.75rem;
     letter-spacing:.24em;
     margin-bottom:20px;
+    font-family:'JetBrains Mono',monospace;
 }
 
 .main-title{
@@ -172,24 +198,13 @@ main{
     left:-25%;
     width:25%;
     height:100%;
-
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(163,18,18,.8),
-        transparent
-    );
-
+    background:linear-gradient(90deg, transparent, var(--red-bright), transparent);
     animation:scan 8s linear infinite;
 }
 
 @keyframes scan{
-    from{
-        left:-25%;
-    }
-    to{
-        left:125%;
-    }
+    from{left:-25%}
+    to{left:125%}
 }
 
 .language-list{
@@ -204,155 +219,154 @@ main{
     display:flex;
     justify-content:space-between;
     align-items:center;
-
     padding:20px 24px;
-
     border:1px solid var(--line);
-
     text-decoration:none;
-
     color:var(--text);
-
     transition:.35s ease;
-
     background:rgba(255,255,255,.015);
+    clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);
 }
 
 .language-card:hover{
-    border-color:rgba(163,18,18,.45);
+    border-color:var(--red-bright);
     transform:translateY(-2px);
-    background:rgba(255,255,255,.025);
+    background:rgba(230,57,70,0.08);
+    box-shadow:0 0 15px var(--red-glow);
 }
 
 .language-name{
     font-size:1rem;
     letter-spacing:.08em;
+    font-weight:600;
+    font-family:'JetBrains Mono',monospace;
 }
 
 .language-arrow{
     color:var(--muted);
+    transition:transform .3s ease, color .3s ease;
 }
 
 .language-card:hover .language-arrow{
-    color:var(--text);
+    color:#fff;
+    transform:translateX(3px);
 }
 
-.helper{
-    margin-top:24px;
-    color:var(--muted);
-    font-size:.82rem;
-    letter-spacing:.08em;
-}
-
-/* FOOTER */
-
+/* FOOTER (Master 4-Column) */
 footer{
-    margin-top:80px;
-
-    border-top:1px solid var(--line);
-
-    padding-top:24px;
-
-    display:flex;
-    justify-content:space-between;
-    gap:20px;
-    flex-wrap:wrap;
+    margin-top:60px;border-top:1px solid var(--line);padding-top:24px;
+    display:grid;
+    grid-template-columns:minmax(0, .85fr) minmax(0, 1.55fr);
+    grid-template-rows:auto auto;
+    column-gap:36px;row-gap:0;align-items:start;
+    position:relative;min-width:0;
+}
+footer::before{
+    content:"";position:absolute;top:-1px;right:0;width:120px;height:1px;
+    background:var(--red-bright);box-shadow:0 0 10px var(--red-glow);
 }
 
-.signature{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
+.footer-brand{grid-column:1;grid-row:1;display:flex;align-items:flex-start;gap:14px;max-width:360px;min-width:0}
+.footer-logo{
+    flex:0 0 42px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:1.15rem;background:linear-gradient(135deg,#e63946 0%,#700d11 100%);
+    border:1px solid var(--red-bright);box-shadow:0 0 14px rgba(230,57,70,.22);
+    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
 }
-
-.signature-title{
-    font-size:.82rem;
-    letter-spacing:.12em;
-    color:#d9d9d9;
+.footer-brand-copy{display:flex;flex-direction:column;gap:7px}
+.footer-signature{
+    font-size:.82rem;letter-spacing:.12em;color:#fff;font-weight:700;
+    font-family:'JetBrains Mono',monospace;text-shadow:0 0 8px rgba(255,255,255,0.2);
 }
-
-.signature-site a{
-    color:var(--muted);
-    text-decoration:none;
-    transition:.3s;
+.footer-tagline{font-size:.68rem;color:var(--red-bright);letter-spacing:.12em;font-family:'JetBrains Mono',monospace}
+.footer-description{font-size:.78rem;line-height:1.8;color:var(--muted);max-width:330px}
+.footer-grid{
+    grid-column:2;grid-row:1 / 3;min-width:0;
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;
+    padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
 }
-
-.signature-site a:hover{
-    color:white;
+.footer-column{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0}
+.footer-heading{font-family:'JetBrains Mono',monospace;color:var(--red-bright);font-size:.68rem;letter-spacing:.14em;font-weight:700}
+.footer-column-title{font-size:.82rem;color:#fff;font-weight:600;letter-spacing:.04em;margin-bottom:2px}
+.footer-column a,.footer-column .footer-static{
+    color:var(--muted);text-decoration:none;font-size:.72rem;letter-spacing:.04em;line-height:1.5;
+    font-family:'JetBrains Mono',monospace;transition:color .2s,transform .2s;
 }
-
-.footer-meta{
-    color:var(--muted);
-    font-size:.74rem;
-    letter-spacing:.16em;
+.footer-column a:hover{color:#fff;text-shadow:0 0 8px var(--red-glow);transform:translateX(2px)}
+.footer-contact-note{font-family:'Inter',sans-serif!important;letter-spacing:0!important;line-height:1.7!important}
+.footer-bottom{grid-column:1;grid-row:2;width:100%;min-width:0;display:flex;justify-content:flex-start;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-top:20px}
+.footer-copyright,.footer-meta{color:var(--muted);font-size:.66rem;letter-spacing:.08em;text-align:left;line-height:1.8;font-family:'JetBrains Mono',monospace;max-width:100%;overflow-wrap:anywhere}
+.footer-meta{color:var(--muted);font-size:.66rem;letter-spacing:.12em;text-align:left;line-height:1.8;font-family:'JetBrains Mono',monospace}
+.footer-meta-label{color:#fff}
+.status-indicator{display:inline-flex;align-items:center;gap:6px;color:#fff;font-weight:700}
+.dot{
+    width:7px;height:7px;background:var(--green-glow);border-radius:50%;
+    box-shadow:0 0 10px var(--green-glow),0 0 20px var(--green-glow);animation:hardPulse 1.2s infinite;
 }
+@keyframes hardPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.7)}}
 
 /* MOBILE */
-
-@media(max-width:768px){
-
-    .wrapper{
-        padding:28px;
-    }
-
-    header{
-        flex-direction:column;
-    }
-
-    footer{
-        flex-direction:column;
-    }
-
-    .language-card{
-        padding:18px 18px;
-    }
-
+@media(max-width:900px){
+    .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 22px}
 }
-
+@media(max-width:768px){
+    .wrapper{padding:20px 16px}
+    header.site-header{flex-direction:column;align-items:flex-start;gap:16px}
+    .header-nav{width:100%;gap:6px}
+    .header-nav a{font-size:.64rem;padding:8px 10px}
+    footer{display:flex;flex-direction:column;gap:24px}
+    .footer-brand,.footer-grid,.footer-bottom{grid-column:auto;grid-row:auto}
+    .footer-grid{width:100%;padding:24px 0;gap:24px 16px}
+    .footer-bottom{align-items:flex-start;flex-direction:column;padding-top:0}
+    .footer-meta{text-align:left}
+}
 </style>
+
+<meta name="description" content="KURENAI VOIDのアプリケーションゲートウェイ。FREEおよびPAIDアプリケーションへのアクセス。">
+<link rel="canonical" href="https://kurenaivoid.github.io/kurenai-system/ai-systems/applications/">
 </head>
 <body>
 
+<!-- 起動時ブート演出 -->
+<div class="boot-screen">
+    <div class="boot-text">INITIALIZING KURENAI_SYS... OK</div>
+</div>
+
 <div class="wrapper">
 
-<header>
-
-    <div class="header-left">
-
-        <div class="page-title">
-            APPLICATIONS / KURENAI VOID
+<!-- 共通ヘッダー -->
+<header class="site-header">
+    <a href="https://kurenaivoid.github.io/kurenai-system/" class="header-brand">
+        <div class="logo-box">紅</div>
+        <div class="brand-text">
+            <span class="brand-title">KURENAI SYSTEM</span>
+            <span class="brand-sub">SYS_CORE // V2.6_ACTIVE</span>
         </div>
-
-        <div class="system-tag">
-            KURENAI SYSTEM / BEYOND THE PROMPT
-        </div>
-
-    </div>
-
-    <div class="header-right">
-        APPLICATION ACCESS<br>
-        ACCESS POINT
-    </div>
-
+    </a>
+    <nav class="header-nav" aria-label="メインナビゲーション">
+        <a href="https://kurenaivoid.github.io/kurenai-system/">TOP</a>
+        <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/">AI SYSTEMS</a>
+        <a href="https://kurenaivoid.github.io/kurenai-system/about/">ABOUT</a>
+        <a href="https://kurenaivoid.github.io/kurenai-system/read/">NOTE</a>
+        <a href="https://kurenaivoid.base.shop/" target="_blank" rel="noopener noreferrer">BASE ↗</a>
+        <a href="https://x.com/kurenai_void" target="_blank" rel="noopener noreferrer">X ↗</a>
+        <a href="https://www.youtube.com/channel/UCjFaTeeWuWpzYTSee1kk_pQ/videos?app=desktop" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+    </nav>
 </header>
 
+<!-- メインコンテンツ -->
 <main>
-
 <section class="language-gate">
-
     <div class="section-label">
         SELECT APPLICATION TYPE
     </div>
-
     <h1 class="main-title">
         Choose Your Application Type
     </h1>
-
     <div class="divider"></div>
 
     <div class="language-list">
-
-        <!-- FREE APPLICATIONS：index.htmlに完全固定修正 -->
+        <!-- FREE APPLICATIONS -->
         <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/applications/free/index.html" class="language-card">
             <span class="language-name">FREE APPLICATIONS</span>
             <span class="language-arrow">→</span>
@@ -363,36 +377,70 @@ footer{
             <span class="language-name">PAID APPLICATIONS</span>
             <span class="language-arrow">→</span>
         </a>
-
     </div>
-
 </section>
-
 </main>
 
-<footer>
-
-    <div class="signature">
-
-        <div class="signature-title">
-            KURENAI SYSTEM — Built Beyond the Prompt.
+<!-- 共通フッター -->
+<footer aria-label="サイトフッター">
+    <div class="footer-brand">
+        <div class="footer-logo" aria-hidden="true">紅</div>
+        <div class="footer-brand-copy">
+            <div class="footer-signature">KURENAI SYSTEM</div>
+            <div class="footer-tagline">BUILT BEYOND THE PROMPT.</div>
+            <p class="footer-description">AI・Web・プロンプトを軸に、システムやアプリケーション、関連コンテンツを探求・公開するプロジェクト。</p>
         </div>
-
-        <div class="signature-site">
-            <a href="https://kurenaivoid.github.io/kurenai-system/" target="_blank" rel="noopener noreferrer">
-                KURENAI SYSTEM
-            </a>
-        </div>
-
     </div>
 
-    <div class="footer-meta">
-        KURENAI VOID / APPLICATIONS
+    <div class="footer-grid">
+        <section class="footer-column" aria-label="システム">
+            <div class="footer-heading">01 // EXPLORE</div>
+            <div class="footer-column-title">SYSTEMS</div>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/">AI SYSTEMS</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/applications/">APPLICATIONS</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/porta-web/">PORTA-WEB</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/ai-systems/prompts/">PROMPTS</a>
+        </section>
+
+        <section class="footer-column" aria-label="コンテンツ">
+            <div class="footer-heading">02 // DISCOVER</div>
+            <div class="footer-column-title">CONTENTS</div>
+            <a href="https://kurenaivoid.github.io/kurenai-system/read/">READ / ARTICLES</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/watch/">WATCH / VIDEOS</a>
+            <a href="https://kurenaivoid.github.io/kurenai-system/about/">ABOUT THE PROJECT</a>
+        </section>
+
+        <section class="footer-column" aria-label="公式リンク">
+            <div class="footer-heading">03 // CONNECT</div>
+            <div class="footer-column-title">OFFICIAL LINKS</div>
+            <a href="https://kurenaivoid.base.shop/" target="_blank" rel="noopener noreferrer">BASE / OFFICIAL SHOP ↗</a>
+            <a href="https://x.com/kurenai_void" target="_blank" rel="noopener noreferrer">X / SOCIAL ↗</a>
+            <a href="https://www.youtube.com/channel/UCjFaTeeWuWpzYTSee1kk_pQ/videos?app=desktop" target="_blank" rel="noopener noreferrer">YouTube / CHANNEL ↗</a>
+        </section>
+
+        <section class="footer-column" aria-label="お問い合わせ">
+            <div class="footer-heading">04 // SUPPORT</div>
+            <div class="footer-column-title">CONTACT</div>
+            <span class="footer-static footer-contact-note">質問・不具合報告・各種連絡</span>
+            <a href="mailto:kurenai.void@gmail.com">kurenai.void@gmail.com</a>
+        </section>
     </div>
 
+    <div class="footer-bottom">
+        <div class="footer-copyright">© <span id="copyright-year">2026</span> KURENAI SYSTEM<br>ALL RIGHTS RESERVED.</div>
+        <div class="footer-meta">
+            <span class="footer-meta-label">CORE_VER:</span> 2.6<br>
+            <span class="footer-meta-label">INTERFACE:</span>
+            <span class="status-indicator"><span class="dot" aria-hidden="true"></span> READY</span>
+        </div>
+    </div>
 </footer>
 
 </div>
 
+<script>
+    const yearNode = document.getElementById('copyright-year');
+    if(yearNode) yearNode.textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
