@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090a0b">
+<meta name="description" content="YAUTJA WRIST SYSTEM — Yautja文字と異星の戦術端末をモチーフにした無料ブラウザ・ビジュアルジェネレーター。インストール不要でWebから体験。">
+<title>YAUTJA WRIST SYSTEM // KURENAI VOID</title>
+<style>
+:root{
+  --bg:#090a0b;--panel:#101214;--panel2:#151719;--line:#38312b;
+  --red:#a51f2a;--red2:#ef3945;--gold:#c7a36b;--text:#e9e4dc;
+  --muted:#a09a90;--dim:#5e5b55;--green:#9baf8c;
+  --mono:Consolas,"SFMono-Regular",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans JP",sans-serif;line-height:1.7}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;opacity:.11;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.045) 4px),linear-gradient(90deg,transparent 49.9%,rgba(199,163,107,.07) 50%,transparent 50.1%)}
+a{color:inherit}
+button,a{ -webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.wrap{width:min(1160px,calc(100% - 40px));margin:auto}
+.topbar{height:56px;border-bottom:1px solid #292623;display:flex;align-items:center;justify-content:space-between;gap:20px;font:11px var(--mono);letter-spacing:.14em;color:var(--muted)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:bold;letter-spacing:.16em}
+.brand-mark{width:20px;height:20px;border:1px solid var(--red2);transform:rotate(45deg);display:grid;place-items:center}
+.brand-mark:after{content:"";width:7px;height:7px;background:var(--red2)}
+.top-status{display:flex;align-items:center;gap:9px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.hero{position:relative;min-height:650px;display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:36px;padding:72px 0 82px;overflow:hidden}
+.hero:before{content:"";position:absolute;width:560px;height:560px;right:-90px;top:45px;border-radius:50%;background:radial-gradient(circle,rgba(165,31,42,.17),rgba(165,31,42,.04) 43%,transparent 70%);pointer-events:none}
+.kicker{font:11px var(--mono);letter-spacing:.2em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.kicker:before{content:"";width:32px;height:1px;background:var(--red2)}
+h1{font-size:clamp(42px,6vw,76px);line-height:.98;letter-spacing:-.055em;margin:23px 0 20px;font-weight:900}
+h1 span{display:block;color:var(--red2);font-size:.56em;letter-spacing:.11em;margin-top:15px;font-family:var(--mono);font-weight:500}
+.lead{max-width:510px;color:#c4beb5;font-size:16px;line-height:1.95}
+.lead strong{color:var(--text);font-weight:700}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin:25px 0 30px}
+.tag{border:1px solid #4b4035;color:#c9bda9;padding:5px 9px;font:10px var(--mono);letter-spacing:.09em}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:12px;min-height:48px;padding:0 18px;text-decoration:none;font:700 12px var(--mono);letter-spacing:.08em;border:1px solid var(--red);transition:.2s ease}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:#c02a36;transform:translateY(-2px)}
+.btn-secondary{border-color:#5a5146;color:var(--text);background:#121313}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.btn .arrow{font-size:18px}
+.hero-note{margin-top:18px;color:var(--dim);font:10px var(--mono);letter-spacing:.06em}
+.visual{position:relative;min-height:440px;display:grid;place-items:center}
+.visual-frame{position:relative;width:min(100%,500px);aspect-ratio:1/1;display:grid;place-items:center}
+.visual-frame:before,.visual-frame:after{content:"";position:absolute;inset:8%;border:1px solid rgba(199,163,107,.27);transform:rotate(45deg)}
+.visual-frame:after{inset:17%;border-color:rgba(165,31,42,.4);transform:rotate(0deg)}
+.crosshair{position:absolute;width:90%;height:90%;border:1px dashed rgba(199,163,107,.22);border-radius:50%}
+.crosshair:before,.crosshair:after{content:"";position:absolute;background:rgba(199,163,107,.35)}
+.crosshair:before{width:1px;height:100%;left:50%}.crosshair:after{height:1px;width:100%;top:50%}
+.device{z-index:1;position:relative;width:74%;padding:16px;background:linear-gradient(145deg,#343431,#151718 30%,#080909 70%,#4b4035);border:1px solid #7a6a53;clip-path:polygon(7% 0,93% 0,100% 8%,100% 92%,92% 100%,8% 100%,0 92%,0 8%);box-shadow:0 22px 55px #000}
+.device-inner{border:1px solid #5b4037;background:linear-gradient(135deg,#1a1111,#090b0c 60%);padding:15px}
+.device-head{display:flex;justify-content:space-between;color:var(--gold);font:9px var(--mono);letter-spacing:.13em;border-bottom:1px solid #49342f;padding-bottom:10px}
+.device-screen{margin:14px 0;border:1px solid #55262a;min-height:185px;padding:14px;background:radial-gradient(ellipse at 50% 45%,rgba(165,31,42,.22),transparent 66%),#090a0a;position:relative;overflow:hidden}
+.screen-label{font:9px var(--mono);color:#b67a6e;letter-spacing:.15em}
+.glyphs{font-family:var(--mono);font-size:clamp(20px,3vw,33px);line-height:1.4;letter-spacing:.2em;color:#e7b0a0;text-shadow:0 0 12px rgba(239,57,69,.5);margin:14px 0}
+.scan{height:2px;position:absolute;left:0;right:0;top:45%;background:var(--red2);box-shadow:0 0 13px var(--red2);opacity:.75;animation:scan 4s ease-in-out infinite}
+@keyframes scan{0%,100%{top:10%;opacity:.25}50%{top:90%;opacity:.9}}
+.device-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat{border:1px solid #37312c;padding:8px;text-align:center}
+.stat small{display:block;color:#887d70;font:8px var(--mono);letter-spacing:.1em}
+.stat b{display:block;color:var(--gold);font:12px var(--mono);margin-top:3px}
+.corner{position:absolute;color:#817563;font:9px var(--mono);letter-spacing:.1em}
+.c1{top:9%;left:0}.c2{top:18%;right:-1%}.c3{bottom:12%;left:0}.c4{bottom:7%;right:0}
+.section{padding:78px 0;border-top:1px solid #282522}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:30px}
+.eyebrow{color:var(--red2);font:10px var(--mono);letter-spacing:.18em}
+h2{font-size:clamp(26px,3.4vw,42px);line-height:1.15;margin:9px 0 0;letter-spacing:-.035em}
+.section-intro{max-width:440px;color:var(--muted);font-size:13px;margin:0}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feature{background:linear-gradient(145deg,#151616,#0e0f10);border:1px solid #302b26;padding:23px;min-height:190px;position:relative}
+.feature-no{font:10px var(--mono);color:var(--red2);letter-spacing:.14em}
+.feature-icon{width:36px;height:36px;border:1px solid #554237;display:grid;place-items:center;color:var(--gold);margin:17px 0 12px;font:16px var(--mono)}
+.feature h3{font-size:16px;margin:0 0 8px}.feature p{font-size:12px;color:var(--muted);margin:0;line-height:1.8}
+.demo-band{display:grid;grid-template-columns:1fr auto;align-items:center;gap:25px;padding:30px;border:1px solid #5a2c2f;background:linear-gradient(100deg,rgba(165,31,42,.18),rgba(17,18,19,.95) 68%);position:relative;overflow:hidden}
+.demo-band:after{content:"";position:absolute;right:130px;top:-55px;width:160px;height:160px;border:1px solid rgba(199,163,107,.2);transform:rotate(45deg);pointer-events:none}
+.demo-band h3{font-size:22px;margin:0 0 6px}.demo-band p{font-size:12px;color:var(--muted);margin:0}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;counter-reset:step}
+.step{border-top:1px solid #655042;padding:16px 15px;background:#101112;counter-increment:step}
+.step:before{content:"0" counter(step);display:block;color:var(--red2);font:12px var(--mono);margin-bottom:18px}
+.step h3{font-size:14px;margin:0 0 8px}.step p{font-size:12px;color:var(--muted);margin:0;line-height:1.8}
+.notice{display:grid;grid-template-columns:150px 1fr;gap:20px;border:1px solid #39332b;padding:22px;background:#101112}
+.notice-label{font:10px var(--mono);letter-spacing:.15em;color:var(--gold)}
+.notice p{font-size:12px;color:var(--muted);margin:0}
+.download{padding:50px 0 72px}
+.download-panel{border:1px solid #594238;padding:clamp(24px,5vw,48px);background:radial-gradient(ellipse at 100% 0,rgba(165,31,42,.17),transparent 45%),#111213;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.download-panel h2{margin:8px 0 12px}.download-panel p{color:var(--muted);font-size:13px;max-width:550px;margin:0}
+.download-actions{display:flex;flex-direction:column;gap:10px;min-width:220px}
+.credits{border-top:1px solid #292623;padding:25px 0 32px;color:#807a70;font-size:11px}
+.credits-row{display:flex;justify-content:space-between;gap:20px;align-items:start}
+.credits a{color:#c9bda9}
+.footer-brand{font:11px var(--mono);letter-spacing:.12em;color:#c4b7a4}
+.footer-small{font:9px var(--mono);color:#5f5b55;margin-top:10px;letter-spacing:.07em}
+@media(max-width:800px){
+ .hero{grid-template-columns:1fr;padding:54px 0 60px;gap:10px}.hero-copy{position:relative;z-index:2}.visual{min-height:330px}.visual-frame{max-width:390px}
+ .section-head{display:block}.section-intro{margin-top:15px}.feature-grid{grid-template-columns:1fr}.feature{min-height:0}
+ .steps{grid-template-columns:repeat(2,1fr)}.demo-band{grid-template-columns:1fr}.demo-band .btn{justify-self:start}
+ .download-panel{display:block}.download-actions{margin-top:25px;max-width:360px}.notice{grid-template-columns:1fr;gap:8px}
+}
+@media(max-width:480px){
+ .wrap{width:min(100% - 28px,1160px)}.topbar{height:50px}.top-status{font-size:9px}.hero{padding-top:42px}
+ h1{font-size:43px}.lead{font-size:14px}.visual{min-height:280px}.device{width:81%;padding:10px}.device-inner{padding:10px}.device-screen{min-height:150px}
+ .steps{grid-template-columns:1fr 1fr}.step{padding:13px 11px}.section{padding:56px 0}.credits-row{display:block}.credits-row>div+div{margin-top:15px}
+ .btn{width:100%}.actions{display:grid;grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scan{animation:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+    <a class="brand" href="#top" aria-label="KURENAI VOID top"><span class="brand-mark"></span><span>KURENAI VOID</span></a>
+    <div class="top-status"><span class="status-dot"></span><span>FIELD SYSTEM // PUBLIC ACCESS</span></div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <div class="kicker">Unofficial Fan-Made Visual Tool / 001</div>
+      <h1>YAUTJA<br>WRIST SYSTEM<span>ALIEN GLYPH VISUAL GENERATOR</span></h1>
+      <p class="lead">
+        <strong>異星の戦術端末を、ブラウザの中へ。</strong><br>
+        Yautja文字のビジュアルと、プレデターの腕部デバイスを思わせるインターフェース演出を楽しむ無料ツール。文字を表示し、画面を調整し、自分だけのSF映像素材を作ろう。
+      </p>
+      <div class="hero-tags">
+        <span class="tag">FREE WEB TOOL</span><span class="tag">BROWSER BASED</span><span class="tag">NO INSTALL</span>
+      </div>
+      <div class="actions">
+        <a class="btn btn-primary" href="https://kurenaivoid.github.io/kurenai-system/ai-systems/APPLICATIONS/free/predator_yautja/Yautja%20Wrist%20System.html" target="_blank" rel="noopener">LAUNCH WEB SYSTEM <span class="arrow">↗</span></a>
+        <a class="btn btn-secondary" href="#how-to">操作ガイドを見る <span class="arrow">↓</span></a>
+      </div>
+      <div class="hero-note">NO ACCOUNT REQUIRED / OPEN IN YOUR BROWSER</div>
+    </div>
+
+    <div class="visual" aria-label="異星の腕部端末をイメージしたオリジナルの装飾グラフィック">
+      <div class="visual-frame">
+        <div class="crosshair"></div>
+        <span class="corner c1">SYS.01 // WRIST LINK</span>
+        <span class="corner c2">SECTOR: UNKNOWN</span>
+        <span class="corner c3">SIGNAL DETECTED</span>
+        <span class="corner c4">KV / FIELD LAB</span>
+        <div class="device">
+          <div class="device-inner">
+            <div class="device-head"><span>Y.W.S // INTERFACE</span><span>● ACTIVE</span></div>
+            <div class="device-screen">
+              <div class="screen-label">GLYPH SEQUENCE / LIVE SIMULATION</div>
+              <div class="glyphs">ᚷ ⌖ ⟁ ϟ<br>⌬ ᛟ ⌖ ⟁<br>ϟ ⌬ ᚷ ᛟ</div>
+              <div class="scan"></div>
+            </div>
+            <div class="device-stats">
+              <div class="stat"><small>MODE</small><b>VISUAL</b></div>
+              <div class="stat"><small>LINK</small><b>LOCAL</b></div>
+              <div class="stat"><small>STATUS</small><b>READY</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">01 / SYSTEM CAPABILITIES</div><h2>文字を、端末の演出へ。</h2></div>
+        <p class="section-intro">操作はシンプル。複雑な編集ソフトを使わず、ブラウザ上で表示や演出を試せることを目指したジェネレーター。</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature"><div class="feature-no">FUNCTION / 01</div><div class="feature-icon">⌘</div><h3>文字表示・切替</h3><p>入力テキストと表示モードを操作し、端末に流れる文字列の見せ方を調整。変換・表示の挙動は実際のツール仕様に従います。</p></article>
+        <article class="feature"><div class="feature-no">FUNCTION / 02</div><div class="feature-icon">◉</div><h3>画面演出の調整</h3><p>表示速度、文字サイズ、演出、画像位置や倍率などのコントロールを使い、好みの画面構成を探せます。</p></article>
+        <article class="feature"><div class="feature-no">FUNCTION / 03</div><div class="feature-icon">▣</div><h3>録画・全画面</h3><p>対応ブラウザの録画機能と全画面表示を利用して、デモ映像や制作素材として使える画面を記録できます。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="demo-band">
+        <div><div class="eyebrow">SYSTEM ACCESS / OPEN NOW</div><h3>説明を読むより、まず起動。</h3><p>Web版はブラウザから直接アクセス。インストールやアカウント登録は不要です。</p></div>
+        <a class="btn btn-primary" href="https://kurenaivoid.github.io/kurenai-system/ai-systems/APPLICATIONS/free/predator_yautja/Yautja%20Wrist%20System.html" target="_blank" rel="noopener">OPEN WEB VERSION <span class="arrow">↗</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-to">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">02 / QUICK START</div><h2>操作ガイド</h2></div>
+        <p class="section-intro">画面内の各コントロール名は、公開中のツール本体の表示に合わせて確認してください。</p>
+      </div>
+      <div class="steps">
+        <article class="step"><h3>Web版を開く</h3><p>「Launch Web System」を押してツールを起動。表示が整うまで少し待ちます。</p></article>
+        <article class="step"><h3>テキストを入力</h3><p>テキスト欄に表示したい文字列を入力し、表示モードを選択します。文字変換が必要な場合は、変換結果も確認してください。</p></article>
+        <article class="step"><h3>画面を調整</h3><p>切替速度・文字サイズ・演出・画像位置や倍率を調整し、目的の見え方に合わせます。</p></article>
+        <article class="step"><h3>録画・保存</h3><p>録画開始で画面を記録し、必要に応じて全画面表示を使用します。保存形式はブラウザの対応状況に依存します。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">03 / FIELD NOTES</div><h2>使用前に確認すること</h2></div>
+      </div>
+      <div class="notice">
+        <div class="notice-label">IMPORTANT NOTE</div>
+        <p>録画形式や動作はブラウザ・端末によって異なります。公開版の表示・動作が想定どおりか確認してから制作に利用してください。本ページおよびツールは非公式のファンメイド作品であり、映画シリーズの権利元とは関係ありません。<strong style="color:#e9e4dc">このツールで使用しているYautjaフォントには、作者クレジットの記載が必要です。</strong> フォントを利用・再配布する場合は、元配布ページでライセンス条件を確認し、必要な表示を維持してください。</p>
+      </div>
+      <div class="notice" style="margin-top:12px;border-color:#69433a;background:linear-gradient(110deg,rgba(165,31,42,.09),#101112)">
+        <div class="notice-label">FONT ATTRIBUTION</div>
+        <div>
+          <p style="color:#e9e4dc;font-weight:700;margin-bottom:8px">Yautja — font by mxz123</p>
+          <p>Typeface: <strong style="color:#e9e4dc">Yautja</strong><br>
+          Author: <strong style="color:#e9e4dc">mxz123</strong><br>
+          License: <strong style="color:#e9e4dc">Creative Commons Attribution-ShareAlike 3.0 (CC BY-SA 3.0)</strong><br>
+          FontStruct source: <a href="https://fontstruct.com/fontstructions/show/333947" target="_blank" rel="noopener">Yautja on FontStruct</a><br>
+          License text: <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">creativecommons.org/licenses/by-sa/3.0/</a></p>
+          <p style="margin-top:10px">このクレジットは使用フォントについての表示です。フォント自体を改変・再配布する場合は、CC BY-SA 3.0の条件を確認してください。ツール本体や映像素材など、他の要素の権利・利用条件を許可するものではありません。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="download wrap">
+    <div class="download-panel">
+      <div>
+        <div class="eyebrow">04 / ALTERNATIVE ACCESS</div>
+        <h2>手元にHTML版を保存する。</h2>
+        <p>Web版に加えて、HTMLファイルをダウンロードできます。保存後はファイルを開いて利用してください。ブラウザや環境によって一部機能の動作が異なる場合があります。</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn btn-primary" href="https://github.com/kurenaivoid/kurenai-system/releases/download/yautja-v1.0/Yautja.Wrist.System.html">DOWNLOAD HTML <span class="arrow">↓</span></a>
+        <a class="btn btn-secondary" href="https://kurenaivoid.github.io/kurenai-system/" target="_blank" rel="noopener">KURENAI SYSTEM ↗</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="credits">
+  <div class="wrap credits-row">
+    <div><div class="footer-brand">KURENAI VOID / FIELD SYSTEMS</div><div class="footer-small">UNOFFICIAL FAN-MADE TOOL // NO AFFILIATION WITH THE FILM RIGHTS HOLDERS</div></div>
+    <div>Font credit: <a href="https://fontstruct.com/fontstructions/show/333947" target="_blank" rel="noopener">“Yautja” by mxz123</a> · <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a><br><span style="color:#5f5b55">Font attribution is required. Review the license before modifying or redistributing the font.</span></div>
+  </div>
+</footer>
+</body>
+</html>
